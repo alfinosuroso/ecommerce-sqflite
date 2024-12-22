@@ -99,19 +99,36 @@ class AppThemeData {
             fontWeight: FontWeight.w500,
           ),
         ),
+        // In your app theme file
         inputDecorationTheme: InputDecorationTheme(
-            hintStyle: TextStyle(fontSize: 12.sp),
-            labelStyle: TextStyle(fontSize: 12.sp),
-            contentPadding:
-                EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(22.w),
-              borderSide: const BorderSide(color: Colors.black, width: 1.0),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(22.w),
-              borderSide: const BorderSide(color: Colors.black, width: 1.0),
-            )),
+          hintStyle: TextStyle(fontSize: 12.sp),
+          labelStyle: TextStyle(fontSize: 12.sp),
+          contentPadding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          border: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Set default rounded border to 15
+            borderSide:
+                BorderSide(color: Colors.black.withOpacity(0.2), width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Set enabled border rounded to 15
+            borderSide:
+                BorderSide(color: Colors.black.withOpacity(0.2), width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Set focused border rounded to 15
+            borderSide: const BorderSide(
+                color: AppColors.primaryBlue,
+                width: 2.0), // Blue color when focused
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Set error border rounded to 15
+            borderSide: BorderSide(color: Colors.red, width: 2.0),
+          ),
+        ),
         textTheme: TextTheme(
           displayLarge: TextStyle(
             fontSize: 30.sp,

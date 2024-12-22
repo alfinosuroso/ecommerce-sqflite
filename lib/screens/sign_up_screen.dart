@@ -7,14 +7,14 @@ import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:ecommerce_sqflite/widgets/solid_button.dart';
 import 'package:flutter/material.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final List<String> _roleList = ["Penjual", "Pembeli"];
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -39,11 +39,11 @@ class _SignInScreenState extends State<SignInScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Welcome back to Mally!",
+                "Register",
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: Dimen.textSpacing),
-              Text("Masukkan email dan password untuk masuk",
+              Text("Masukkan email dan password untuk mendaftar",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
@@ -90,6 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   PrimaryTextWidget(
                     onPressed: () {
                       print("Login button pressed");
+                      // Navigator.of(context).push(route)
                     },
                     title: "Login",
                   ),
