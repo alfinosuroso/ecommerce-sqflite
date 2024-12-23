@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../common/app_colors.dart';
 
-class PrimaryTextWidget extends StatelessWidget {
+class PrimaryTextButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String title;
   final TextStyle? style;
 
-  const PrimaryTextWidget({
+  const PrimaryTextButton({
     required this.onPressed,
     required this.title,
     this.style,
@@ -18,7 +18,7 @@ class PrimaryTextWidget extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         minimumSize: const Size(50, 30),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),

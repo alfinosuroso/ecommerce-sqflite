@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 class Dimen {
   // Default padding and margin values
-  static const double pagePadding = 16.0;
+  static const double pagePadding = 20.0;
   static const double screenPadding = 24.0;
   static const double textSpacing = 8.0;
   static const double bigSpacing = 32.0;

@@ -1,11 +1,13 @@
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/main.dart';
 import 'package:ecommerce_sqflite/widgets/custom_dropdown_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:ecommerce_sqflite/widgets/solid_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -87,10 +89,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           .textTheme
                           .bodyMedium!
                           .copyWith(color: AppColors.darkGrey)),
-                  PrimaryTextWidget(
+                  PrimaryTextButton(
                     onPressed: () {
-                      print("Login button pressed");
-                      // Navigator.of(context).push(route)
+                      context.go("/signin");
                     },
                     title: "Login",
                   ),

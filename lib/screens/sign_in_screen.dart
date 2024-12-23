@@ -6,6 +6,7 @@ import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:ecommerce_sqflite/widgets/solid_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -82,16 +83,16 @@ class _SignInScreenState extends State<SignInScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Sudah punya akun?",
+                  Text("Belum punya akun?",
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium!
                           .copyWith(color: AppColors.darkGrey)),
-                  PrimaryTextWidget(
+                  PrimaryTextButton(
                     onPressed: () {
-                      print("Login button pressed");
+                      context.go("/signup");
                     },
-                    title: "Login",
+                    title: "Register",
                   ),
                 ],
               )

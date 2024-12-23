@@ -1,7 +1,9 @@
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
+import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,62 +14,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _router = GoRouter(
+      initialLocation: "/signup",
+      routes: [
+        GoRoute(
+          name: "signup",
+          path: "/signup",
+          builder: (context, state) => const SignUpScreen(),
+        ),
+        GoRoute(
+          name: "signin",
+          path: "/signin",
+          builder: (context, state) => const SignInScreen(),
+        )
+      ]);
     return Sizer(
       builder: (context, orientation, DeviceType) {
-        return MaterialApp(
-          title: 'Flutter Demo',
+        return MaterialApp.router(
+          title: 'Ecommerce Sqflite',
+          debugShowCheckedModeBanner: false,
           theme: AppThemeData.getTheme(context),
-          home: const SignUpScreen(),
+          routerConfig: _router,
         );
       },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
