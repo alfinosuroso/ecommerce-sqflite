@@ -1,4 +1,7 @@
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
+import 'package:ecommerce_sqflite/screens/buyer/buyer_product_detail_screen.dart';
+import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
+import 'package:ecommerce_sqflite/screens/home_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,20 +17,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _router = GoRouter(
-      initialLocation: "/signup",
-      routes: [
-        GoRoute(
-          name: "signup",
-          path: "/signup",
-          builder: (context, state) => const SignUpScreen(),
-        ),
-        GoRoute(
-          name: "signin",
-          path: "/signin",
-          builder: (context, state) => const SignInScreen(),
-        )
-      ]);
+    final _router = GoRouter(initialLocation: "/", routes: [
+      GoRoute(
+        name: "home",
+        path: "/",
+        builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+          name: "product",
+          path: "/product-buyer",
+          builder: (context, state) => const BuyerProductListScreen(),
+          routes: [
+            GoRoute(
+              name: "details",
+              path: "details",
+              builder: (context, state) => const BuyerProductDetailScreen(),
+            )
+          ]),
+      GoRoute(
+        name: "signup",
+        path: "/signup",
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        name: "signin",
+        path: "/signin",
+        builder: (context, state) => const SignInScreen(),
+      ),
+    ]);
     return Sizer(
       builder: (context, orientation, DeviceType) {
         return MaterialApp.router(

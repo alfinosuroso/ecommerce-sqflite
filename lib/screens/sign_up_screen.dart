@@ -5,7 +5,6 @@ import 'package:ecommerce_sqflite/main.dart';
 import 'package:ecommerce_sqflite/widgets/custom_dropdown_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
-import 'package:ecommerce_sqflite/widgets/solid_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,13 +43,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 "Register",
                 style: Theme.of(context).textTheme.displaySmall,
               ),
-              const SizedBox(height: Dimen.textSpacing),
+              Dimen.verticalSpaceSmall,
               Text("Masukkan email dan password untuk mendaftar",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
                       .copyWith(color: AppColors.darkGrey)),
-              const SizedBox(height: Dimen.bigSpacing),
+              Dimen.verticalSpaceLarge,
               CustomTextFormField(
                 title: "Email",
                 controller: _emailController,
@@ -60,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 title: "Password",
                 controller: _passwordController,
               ),
-              const SizedBox(height: Dimen.textSpacing),
+              Dimen.verticalSpaceSmall,
               DropDownTextField(
                   items: _roleList,
                   onChanged: (v) {
@@ -69,8 +68,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     });
                   },
                   title: "Role Pengguna"),
-              const SizedBox(height: Dimen.bigSpacing),
-              SolidButton(
+              Dimen.verticalSpaceMedium,
+              ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     print("sign up");
@@ -78,9 +77,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   }
                 },
-                title: "Sign Up",
+                child: const Text("Sign Up"),
               ),
-              const SizedBox(height: Dimen.pagePadding),
+              Dimen.verticalSpaceMedium,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

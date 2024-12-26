@@ -1,3 +1,4 @@
+import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:flutter/material.dart';
 import '../common/app_colors.dart';
 
@@ -28,7 +29,7 @@ class PrimaryTextButton extends StatelessWidget {
             Theme.of(context)
                 .textTheme
                 .labelLarge!
-                .copyWith(color: AppColors.primaryBlue),
+                .copyWith(color: AppThemeData.getTheme(context).primaryColor),
       ),
     );
   }

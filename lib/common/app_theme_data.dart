@@ -1,3 +1,4 @@
+import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -45,42 +46,36 @@ class AppThemeData {
           color: Colors.white,
           iconTheme: IconThemeData(color: Colors.black, size: 6.w),
           elevation: 0,
-          titleTextStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.bold),
+          titleTextStyle: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
             backgroundColor: primaryColor,
             elevation: 0.0,
-            minimumSize: Size(double.infinity, 6.h),
+            minimumSize: Size(double.infinity, 5.h),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.5.w),
+              borderRadius: BorderRadius.circular(Dimen.radius),
             ),
-            textStyle: TextStyle(
-                fontSize: 13.sp,
-                color: Colors.black,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.2),
+            textStyle: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: Colors.white),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.blue,
+            foregroundColor: Colors.black87,
             elevation: 0.0,
-            side: const BorderSide(color: AppColors.blue, width: 1),
+            side: const BorderSide(color: Colors.black87, width: 1),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22.w),
+              borderRadius: BorderRadius.circular(Dimen.radius),
             ),
-            padding: EdgeInsets.symmetric(
-                horizontal: 8.5.w, vertical: !useMobileLayout ? 1.h : 0),
-            textStyle: TextStyle(
-                fontSize: 13.sp,
-                color: Colors.black,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.2),
+            minimumSize: Size(double.infinity, 5.h),
+            textStyle: Theme.of(context).textTheme.titleSmall,
           ),
         ),
         chipTheme: const ChipThemeData(
@@ -95,7 +90,7 @@ class AppThemeData {
             fontWeight: FontWeight.w500,
           ),
           labelStyle: TextStyle(
-            color: Colors.black,
+            color: AppColors.darkBlue,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -126,7 +121,7 @@ class AppThemeData {
           errorBorder: OutlineInputBorder(
             borderRadius:
                 BorderRadius.circular(15.0), // Set error border rounded to 15
-            borderSide: BorderSide(color: Colors.red, width: 2.0),
+            borderSide: const BorderSide(color: Colors.red, width: 2.0),
           ),
         ),
         textTheme: TextTheme(

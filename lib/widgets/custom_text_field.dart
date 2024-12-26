@@ -1,9 +1,7 @@
 // ignore: file_names
-import 'dart:io';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sizer/sizer.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -42,7 +40,7 @@ class CustomTextFormField extends StatefulWidget {
   final List<DropdownMenuItem<String>>? customDropdownItems;
   final String? customSelectedValue;
 
-  CustomTextFormField(
+  const CustomTextFormField(
       {this.controller,
       this.validator,
       this.keyboardType = TextInputType.text,
@@ -91,14 +89,14 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.title!, style: Theme.of(context).textTheme.bodyMedium),
-        SizedBox(
-          height: 1.h,
-        ),
+        widget.title != null || widget.title == ""
+            ? Text(widget.title!, style: Theme.of(context).textTheme.bodyMedium)
+            : const SizedBox(height: 0),
+        widget.title != null || widget.title == ""
+            ? SizedBox(height: 1.h)
+            : const SizedBox(height: 0),
         _buildRegularTextForm(context),
-        SizedBox(
-          height: 2.h,
-        ),
+        SizedBox(height: 2.h),
       ],
     );
   }

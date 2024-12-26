@@ -4,7 +4,6 @@ import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/widgets/custom_dropdown_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
-import 'package:ecommerce_sqflite/widgets/solid_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -59,25 +58,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 title: "Password",
                 controller: _passwordController,
               ),
-              const SizedBox(height: Dimen.textSpacing),
-              DropDownTextField(
-                  items: _roleList,
-                  onChanged: (v) {
-                    setState(() {
-                      _roleController.text = v;
-                    });
-                  },
-                  title: "Role Pengguna"),
               const SizedBox(height: Dimen.bigSpacing),
-              SolidButton(
+              ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    print("sign up");
+                    context.go('/product-buyer');
+                    print("sign in");
                   } else {
                     return null;
                   }
                 },
-                title: "Sign Up",
+                child: const Text("Sign In"),
               ),
               const SizedBox(height: Dimen.pagePadding),
               Row(
