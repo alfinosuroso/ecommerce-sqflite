@@ -18,7 +18,7 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: _buildBody(context),
     );
   }
@@ -94,12 +94,14 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text("Belanja"),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            context.go("/product-buyer/cart");
+          },
           icon: const Icon(Icons.shopping_cart_checkout),
         )
       ],

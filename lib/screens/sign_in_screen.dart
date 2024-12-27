@@ -1,7 +1,6 @@
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
-import 'package:ecommerce_sqflite/widgets/custom_dropdown_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +14,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final List<String> _roleList = ["Penjual", "Pembeli"];
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override

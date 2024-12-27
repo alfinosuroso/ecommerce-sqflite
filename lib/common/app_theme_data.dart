@@ -23,10 +23,6 @@ class AppThemeData {
     final MaterialColor primaryMaterialColor =
         MaterialColor(primaryColor.value, primaryColorMap);
 
-    double width = 100.w;
-
-    final bool useMobileLayout = width < 600;
-
     return ThemeData(
         fontFamily: 'Montserrat',
         canvasColor: Colors.white,
@@ -152,7 +148,7 @@ class AppThemeData {
           ),
           headlineSmall: TextStyle(
             fontSize: 20.sp,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
           titleLarge: TextStyle(

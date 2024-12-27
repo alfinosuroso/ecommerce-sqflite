@@ -6,13 +6,15 @@ class Dimen {
   static const double pagePadding = 20.0;
   static const double screenPadding = 24.0;
   static const double textSpacing = 8.0;
-  static const double mediumSpacing = 12.0;
+  static const double mediumSpacing = 16.0;
   static const double bigSpacing = 32.0;
   static const double radius = 16.0;
   static const double mediumRadius = 25.0;
 
   // Custom padding
   static EdgeInsets defaultPadding = const EdgeInsets.all(pagePadding);
+  static EdgeInsets smallPadding = const EdgeInsets.all(textSpacing);
+  static EdgeInsets defaultMargin = const EdgeInsets.symmetric(horizontal: pagePadding, vertical: textSpacing);
   static EdgeInsets horizontalPadding = const EdgeInsets.symmetric(horizontal: screenPadding);
   static EdgeInsets verticalPaddingMedium = const EdgeInsets.symmetric(vertical: screenPadding);
   static EdgeInsets verticalPaddingSmall = const EdgeInsets.symmetric(vertical: textSpacing);
