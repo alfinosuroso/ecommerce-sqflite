@@ -28,67 +28,86 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
       padding: Dimen.defaultPadding,
       child: Column(
         children: [
-          const CustomTextFormField(
-            title: null,
-            hintText: "Cari nama produk...",
-            prefix: Icon(
-              Icons.search,
-              color: Colors.grey,
-            ),
-          ),
-          OutlinedButton(
-              onPressed: () {
-                _showFilterSortingSheet(context);
-              },
-              child: const Text("Filter & Sorting")),
+          _searchBar(),
+          _filterSortingButton(),
           Dimen.verticalSpaceMedium,
           Expanded(
-            child: GridView.builder(
-              itemCount: 10,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+            child: _productGrid(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _searchBar() {
+    return const CustomTextFormField(
+      title: null,
+      hintText: "Cari nama produk...",
+      prefix: Icon(
+        Icons.search,
+        color: Colors.grey,
+      ),
+    );
+  }
+
+  Widget _filterSortingButton() {
+    return OutlinedButton(
+      onPressed: () {
+        _showFilterSortingSheet(context);
+      },
+      child: const Text("Filter & Sorting"),
+    );
+  }
+
+  Widget _productGrid() {
+    return GridView.builder(
+      itemCount: 10,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemBuilder: (context, index) {
+        return _productItem(index: index);
+      },
+    );
+  }
+
+  Widget _productItem({
+    required int index,
+  }) {
+    return InkWell(
+      onTap: () {
+        context.go("/product-buyer/details");
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(Dimen.radius),
+              child: Image.asset(
+                "assets/images/sample-1.jpeg",
+                fit: BoxFit.cover,
+                width: double.infinity,
               ),
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    context.go("/product-buyer/details");
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(Dimen.radius),
-                          child: Image.asset(
-                            "assets/images/sample-1.jpeg",
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                        ),
-                      ),
-                      Dimen.verticalSpaceSmall,
-                      Text(
-                        "Product Name LongLongLongLong",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        "Rp. 50000",
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: AppThemeData.getTheme(context).primaryColor),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
-          )
+          ),
+          Dimen.verticalSpaceSmall,
+          Text(
+            "Product Name LongLongLongLong",
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey,
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "Rp. 50000",
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: AppThemeData.getTheme(context).primaryColor,
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

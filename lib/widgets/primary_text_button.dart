@@ -1,6 +1,5 @@
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:flutter/material.dart';
-import '../common/app_colors.dart';
 
 class PrimaryTextButton extends StatelessWidget {
   final VoidCallback onPressed;

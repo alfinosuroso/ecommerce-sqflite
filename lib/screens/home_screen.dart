@@ -1,4 +1,6 @@
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
+import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
+import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -6,10 +8,13 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String role = "buyer";
+    String role = "seller";
     if (role == "buyer") {
       return const BuyerProductListScreen();
     }
-    return const Placeholder();
+    if (role == "seller") {
+      return const SellerProductListScreen();
+    }
+    return const SignInScreen();
   }
 }

@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 
 class DropDownTextField extends StatelessWidget {
   DropDownTextField({
-    Key? key,
+    super.key,
     required this.items,
     required this.onChanged,
     required this.title,
@@ -13,7 +13,7 @@ class DropDownTextField extends StatelessWidget {
     this.notifFilter,
     this.value,
     this.nullValue,
-  }) : super(key: key);
+  });
 
   final List<String> items;
   final String? value;

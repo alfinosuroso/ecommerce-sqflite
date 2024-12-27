@@ -1,7 +1,6 @@
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
-import 'package:ecommerce_sqflite/main.dart';
 import 'package:ecommerce_sqflite/widgets/custom_dropdown_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
