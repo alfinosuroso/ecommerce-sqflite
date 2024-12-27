@@ -54,6 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
               CustomTextFormField(
                 title: "Password",
                 controller: _passwordController,
+                obsecure: true,
               ),
               const SizedBox(height: Dimen.bigSpacing),
               ElevatedButton(

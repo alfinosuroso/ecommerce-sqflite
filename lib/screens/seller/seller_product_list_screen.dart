@@ -1,6 +1,7 @@
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
@@ -30,7 +31,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
   FloatingActionButton _buildFab(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {
-        context.go("/product-seller/add");
+        context.go("/product-seller/add-edit");
       },
       child: const Icon(Icons.add),
     );
@@ -127,7 +128,19 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                  child: ElevatedButton(onPressed: () {}, child: Text("Edit"))),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        context.go("/product-seller/add-edit",
+                            extra: Product(
+                                id: 0,
+                                name: "name",
+                                description: "description",
+                                image: "assets/images/sample-1.jpeg",
+                                price: 20000,
+                                stock: 10,
+                                sellerId: 1));
+                      },
+                      child: const Text("Edit"))),
               Dimen.horizontalSpaceMedium,
               PrimaryTextButton(
                 style: Theme.of(context)
@@ -147,12 +160,6 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text("List Produk"),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.add),
-        )
-      ],
     );
   }
 

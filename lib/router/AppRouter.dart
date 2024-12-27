@@ -1,4 +1,6 @@
+import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/screens/buyer/order_success_screen.dart';
+import 'package:ecommerce_sqflite/screens/seller/add_edit_product_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_detail_screen.dart';
@@ -42,7 +44,16 @@ class AppRouter {
           name: "product-seller",
           path: "/product-seller",
           builder: (context, state) => const SellerProductListScreen(),
-          routes: []),
+          routes: [
+            GoRoute(
+              name: "add-edit",
+              path: "add-edit",
+              builder: (context, state) {
+                final product = state.extra as Product?;
+                return AddEditProductScreen(product: product);
+              },
+            ),
+          ]),
       GoRoute(
         name: "signup",
         path: "/signup",

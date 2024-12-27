@@ -57,6 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               CustomTextFormField(
                 title: "Password",
                 controller: _passwordController,
+                obsecure: true,
               ),
               Dimen.verticalSpaceSmall,
               DropDownTextField(

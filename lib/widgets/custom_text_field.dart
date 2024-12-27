@@ -116,7 +116,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       initialValue: widget.currentValue,
       onEditingComplete: widget.onEditingCompleted,
       autofocus: widget.autofocus!,
-      minLines: widget.isMulti! ? 5 : 1,
+      minLines: widget.isMulti! ? 6 : 1,
       maxLines: widget.isMulti! ? null : 1,
       onTap: widget.onTap,
       enabled: widget.enabled,
