@@ -1,4 +1,4 @@
-import 'package:ecommerce_sqflite/bloc/bloc/user_bloc.dart';
+import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';

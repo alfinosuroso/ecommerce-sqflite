@@ -7,6 +7,7 @@ sealed class UserEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// TODO: delete this class
 class GetUserById extends UserEvent {
   final int id;
   const GetUserById(this.id);
@@ -36,6 +37,8 @@ class CheckUser extends UserEvent {
   List<Object> get props => [];
 }
 
+// TODO: delete this class
+
 class UpdateUser extends UserEvent {
   final User user;
   const UpdateUser(this.user);
@@ -44,6 +47,7 @@ class UpdateUser extends UserEvent {
   List<Object> get props => [user];
 }
 
+// TODO: delete this class
 class DeleteUser extends UserEvent {
   final int id;
   const DeleteUser(this.id);

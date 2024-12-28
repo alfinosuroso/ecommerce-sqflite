@@ -1,4 +1,4 @@
-import 'package:ecommerce_sqflite/bloc/bloc/user_bloc.dart';
+import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';

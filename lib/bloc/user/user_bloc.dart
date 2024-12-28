@@ -12,16 +12,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   final UserDao userDao;
   final AuthService authService;
   UserBloc(this.userDao, this.authService) : super(UserInitial()) {
-    on<UserEvent>((event, emit) {});
-    on<GetUserById>((event, emit) async {
-      try {
-        final user = await userDao.getUser(event.id);
-        emit(UserByIdLoaded(user));
-      } catch (e) {
-        debugPrint(e.toString());
-        emit(UserError(e.toString()));
-      }
-    });
     on<LoginUser>((event, emit) async {
       emit(UserLoading());
       try {
