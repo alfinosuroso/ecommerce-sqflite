@@ -1,6 +1,6 @@
 // models/product_model.dart
 class Product {
-  final int id;
+  final int? id;
   final String name;
   final String description;
   final String image;
@@ -41,4 +41,14 @@ class Product {
       'sellerId': sellerId
     };
   }
+
+  Product.empty()
+      : this(
+            id: null,
+            name: '',
+            description: '',
+            image: '',
+            price: 0.0,
+            stock: 0,
+            sellerId: 0);
 }

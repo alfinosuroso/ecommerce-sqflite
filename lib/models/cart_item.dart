@@ -1,6 +1,6 @@
 // models/cart_item_model.dart
 class CartItem {
-  final int id;
+  final int? id;
   final int userId; // Foreign key to the User (Buyer)
   final int productId; // Foreign key to the Product
   final int quantity;

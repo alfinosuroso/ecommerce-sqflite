@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ecommerce_sqflite/services/tables/product_table.dart';
 import 'package:ecommerce_sqflite/services/tables/user_table.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,5 +34,6 @@ class DBHelper {
 
   void initDB(Database database, int version) async {
     UserTable.createTable(database, version);
+    ProductTable.createTable(database, version);
   }
 }
