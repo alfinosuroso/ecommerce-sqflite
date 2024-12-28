@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String role = "seller";
+    String role = "";
     if (role == "buyer") {
       return const BuyerProductListScreen();
     }

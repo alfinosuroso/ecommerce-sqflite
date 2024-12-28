@@ -1,10 +1,10 @@
 // models/User_model.dart
 class User {
-  final int id;
+  final int? id;
   final String username;
   final String email;
   final String password;
-  final Role role; // 'buyer' or 'seller'
+  final String role; // 'buyer' or 'seller'
 
   User({
     required this.id,
@@ -24,6 +24,7 @@ class User {
       );
 
   // Convert to Map
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -33,6 +34,11 @@ class User {
       'role': role,
     };
   }
-}
 
-enum Role { buyer, seller }
+  const User.empty()
+      : id = -1,
+        username = '',
+        email = '',
+        password = '',
+        role = '';
+}
