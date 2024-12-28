@@ -16,11 +16,11 @@ class GetUserById extends UserEvent {
 }
 
 class LoginUser extends UserEvent {
-  final String name, password;
-  const LoginUser(this.name, this.password);
+  final String email, password;
+  const LoginUser(this.email, this.password);
 
   @override
-  List<Object> get props => [name, password];
+  List<Object> get props => [email, password];
 }
 
 class RegisterUser extends UserEvent {
@@ -29,6 +29,11 @@ class RegisterUser extends UserEvent {
 
   @override
   List<Object> get props => [user];
+}
+
+class CheckUser extends UserEvent {
+  @override
+  List<Object> get props => [];
 }
 
 class UpdateUser extends UserEvent {

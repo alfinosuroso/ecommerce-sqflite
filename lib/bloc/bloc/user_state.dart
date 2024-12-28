@@ -23,8 +23,11 @@ class UserByIdLoaded extends UserState {
 }
 
 class UserSuccess extends UserState {
+  final String message;
+
+  const UserSuccess(this.message);
   @override
-  List<Object> get props => [];
+  List<Object> get props => [message];
 }
 
 class UserError extends UserState {

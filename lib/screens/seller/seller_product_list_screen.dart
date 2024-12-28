@@ -1,11 +1,15 @@
+import 'package:ecommerce_sqflite/bloc/bloc/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class SellerProductListScreen extends StatefulWidget {
@@ -160,6 +164,16 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text("List Produk"),
+      actions: [
+        IconButton(
+          onPressed: () async {
+            await AuthService().clearUser();
+            SharedCode(context).successSnackBar(text: "Berhasil logout");
+            context.read<UserBloc>().add(CheckUser());
+          },
+          icon: const Icon(Icons.logout),
+        )
+      ],
     );
   }
 

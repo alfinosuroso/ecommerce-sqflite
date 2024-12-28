@@ -2,6 +2,7 @@ import 'package:ecommerce_sqflite/bloc/bloc/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/router/AppRouter.dart';
 import 'package:ecommerce_sqflite/services/dao/user_dao.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, DeviceType) {
         return BlocProvider(
-          create: (context) => UserBloc(UserDao()),
+          create: (context) =>
+              UserBloc(UserDao(), AuthService())..add(CheckUser()),
           child: MaterialApp.router(
             title: 'Ecommerce Sqflite',
             debugShowCheckedModeBanner: false,

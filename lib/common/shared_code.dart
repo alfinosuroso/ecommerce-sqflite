@@ -1,4 +1,6 @@
+import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class SharedCode {
   final BuildContext context;
@@ -13,6 +15,44 @@ class SharedCode {
   }
 
   String? emptyValidator(value) {
-    return value.toString().trim().isEmpty ? "Field can't be empty" : null;
+    return value.toString().trim().isEmpty || value == null
+        ? "Field can't be empty"
+        : null;
+  }
+
+  void successSnackBar({
+    required String text,
+  }) {
+    final snackBar = SnackBar(
+      content: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(color: Colors.white),
+      ),
+      backgroundColor: AppColors.green,
+      duration: const Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void errorSnackBar({
+    required String text,
+  }) {
+    final snackBar = SnackBar(
+      content: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(color: Colors.white),
+      ),
+      backgroundColor: AppColors.darkRed,
+      duration: const Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

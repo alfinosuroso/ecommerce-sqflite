@@ -13,6 +13,7 @@ class DropDownTextField extends StatelessWidget {
     this.notifFilter,
     this.value,
     this.nullValue,
+    this.validator,
   });
 
   final List<String> items;
@@ -23,6 +24,7 @@ class DropDownTextField extends StatelessWidget {
   bool? enabled;
   bool? notifFilter;
   String? nullValue;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +75,11 @@ class DropDownTextField extends StatelessWidget {
           );
         },
       ).toList(),
-      validator: (value) {
-        // Ensure the dropdown value is not empty
-        return SharedCode(context).emptyValidator(value);
-      },
+      validator: validator ??
+          (value) {
+            return SharedCode(context).emptyValidator(value);
+          },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 }

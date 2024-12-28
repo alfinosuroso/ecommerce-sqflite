@@ -21,13 +21,27 @@ class UserDao {
     return userModel.isNotEmpty ? userModel[0] : const User.empty();
   }
 
+  Future<User> verifyUserCredential(String email, String password) async {
+    final db = await dbProvider.database;
+    final result = await db.query(
+      UserTable.USERS_TABLE,
+      where: '${UserTable.USERS_EMAIL} = ? AND ${UserTable.USERS_PASSWORD} = ?',
+      whereArgs: [email, password],
+    );
+
+    List<User> userModel = result.isNotEmpty
+        ? result.map((row) => User.fromMap(row)).toList()
+        : [];
+    return userModel.isNotEmpty ? userModel[0] : const User.empty();
+  }
+
   Future<bool> insertUser(User user) async {
     final db = await dbProvider.database;
 
     final result = await db.query(
       UserTable.USERS_TABLE,
-      where: '${UserTable.USERS_NAME} = ?',
-      whereArgs: [user.username],
+      where: '${UserTable.USERS_EMAIL} = ?',
+      whereArgs: [user.email],
     );
 
     if (result.isNotEmpty) {

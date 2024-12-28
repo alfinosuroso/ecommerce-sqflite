@@ -1,9 +1,13 @@
+import 'package:ecommerce_sqflite/bloc/bloc/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/services/dao/user_dao.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -21,7 +25,17 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildBody(context),
+      body: BlocListener<UserBloc, UserState>(
+        listener: (context, state) {
+          if (state is UserSuccess) {
+            SharedCode(context).successSnackBar(text: state.message);
+            context.go("/");
+          } else if (state is UserError) {
+            SharedCode(context).errorSnackBar(text: state.message);
+          }
+        },
+        child: _buildBody(context),
+      ),
     );
   }
 
@@ -60,10 +74,11 @@ class _SignInScreenState extends State<SignInScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    context.go('/product-buyer');
-                    print("sign in");
-                  } else {
-                    return null;
+                    debugPrint("login");
+                    context.read<UserBloc>().add(LoginUser(
+                        _emailController.text, _passwordController.text));
+                    debugPrint("login2");
+
                   }
                 },
                 child: const Text("Sign In"),

@@ -36,7 +36,7 @@ class User {
   }
 
   const User.empty()
-      : id = -1,
+      : id = null,
         username = '',
         email = '',
         password = '',

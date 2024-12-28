@@ -31,12 +31,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Registration Successful')));
+            SharedCode(context).successSnackBar(text: state.message);
             context.go("/signin");
           } else if (state is UserError) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            SharedCode(context).errorSnackBar(text: state.message);
           }
         },
         child: _buildBody(context),
@@ -75,6 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     title: "Email",
                     controller: _emailController,
                     validator: SharedCode(context).emailValidator,
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   CustomTextFormField(
                     title: "Password",
@@ -104,6 +103,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         debugPrint(_roleController.text);
                         context.read<UserBloc>().add(RegisterUser(newUser));
                       }
+                      debugPrint("Role: ${_roleController.text}");
                     },
                     child: const Text("Sign Up"),
                   ),
