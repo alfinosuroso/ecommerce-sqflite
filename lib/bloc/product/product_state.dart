@@ -12,7 +12,7 @@ class ProductInitial extends ProductState {}
 class ProductLoading extends ProductState {}
 
 class ProductLoaded extends ProductState {
-  final List<Product> products;
+  final List<ProductDetail> products;
   const ProductLoaded(this.products);
 
   @override
@@ -20,7 +20,7 @@ class ProductLoaded extends ProductState {
 }
 
 class ProductLoadedById extends ProductState {
-  final Product product;
+  final ProductDetail product;
   const ProductLoadedById(this.product);
 
   @override

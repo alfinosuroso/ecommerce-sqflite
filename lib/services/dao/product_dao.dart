@@ -1,6 +1,8 @@
 import 'package:ecommerce_sqflite/models/product.dart';
+import 'package:ecommerce_sqflite/models/product_detail.dart';
 import 'package:ecommerce_sqflite/services/database/db_helper.dart';
 import 'package:ecommerce_sqflite/services/tables/product_table.dart';
+import 'package:ecommerce_sqflite/services/tables/user_table.dart';
 
 class ProductDao {
   final DBHelper dbProvider;
@@ -16,34 +18,111 @@ class ProductDao {
   }
 
   // BUYER
-  Future<List<Product>> getProducts() async {
-    final db = await dbProvider.database;
-    final result = await db.query(ProductTable.PRODUCTS_TABLE);
-    List<Product> products = result.isNotEmpty
-        ? result.map((row) => Product.fromMap(row)).toList()
-        : [];
-    return products;
-  }
+  // Future<List<Product>> getProducts() async {
+  //   final db = await dbProvider.database;
+  //   final result = await db.query(ProductTable.PRODUCTS_TABLE);
+  //   List<Product> products = result.isNotEmpty
+  //       ? result.map((row) => Product.fromMap(row)).toList()
+  //       : [];
+  //   return products;
+  // }
 
   // SELLER
-  Future<List<Product>> getProductsBySellerId(int sellerId) async {
+  // Future<List<Product>> getProductsByUserId(int userId) async {
+  //   final db = await dbProvider.database;
+  //   final result = await db.query(ProductTable.PRODUCTS_TABLE,
+  //       where: '${ProductTable.PRODUCTS_USER_ID} = ?', whereArgs: [userId]);
+  //   List<Product> products = result.isNotEmpty
+  //       ? result.map((row) => Product.fromMap(row)).toList()
+  //       : [];
+  //   return products;
+  // }
+
+  // Future<Product> getProductById(int productId) async {
+  //   final db = await dbProvider.database;
+  //   final result = await db.query(ProductTable.PRODUCTS_TABLE,
+  //       where: '${ProductTable.PRODUCTS_ID} = ?', whereArgs: [productId]);
+  //   List<Product> products = result.isNotEmpty
+  //       ? result.map((row) => Product.fromMap(row)).toList()
+  //       : [];
+  //   return products.isNotEmpty ? products[0] : Product.empty();
+  // }
+
+  Future<List<ProductDetail>> getAllProductDetails() async {
     final db = await dbProvider.database;
-    final result = await db.query(ProductTable.PRODUCTS_TABLE,
-        where: '${ProductTable.PRODUCTS_SELLER_ID} = ?', whereArgs: [sellerId]);
-    List<Product> products = result.isNotEmpty
-        ? result.map((row) => Product.fromMap(row)).toList()
-        : [];
-    return products;
+
+    final result = await db.rawQuery('''
+    SELECT 
+      p.id AS product_id, 
+      p.name AS product_name,
+      p.description AS product_description,
+      p.image AS product_image,
+      p.price AS product_price,
+      p.stock AS product_stock,
+      p.userId AS user_id,
+      u.id AS user_id, 
+      u.username AS user_username, 
+      u.email AS user_email, 
+      u.role AS user_role
+    FROM ${ProductTable.PRODUCTS_TABLE} p
+    INNER JOIN ${UserTable.USERS_TABLE} u
+    ON p.${ProductTable.PRODUCTS_USER_ID} = u.${UserTable.USERS_ID}
+  ''');
+
+    return result.map((row) => ProductDetail.fromQueryRow(row)).toList();
   }
 
-  Future<Product> getProductById(int productId) async {
+  Future<ProductDetail> getProductDetailById(int productId) async {
     final db = await dbProvider.database;
-    final result = await db.query(ProductTable.PRODUCTS_TABLE,
-        where: '${ProductTable.PRODUCTS_ID} = ?', whereArgs: [productId]);
-    List<Product> products = result.isNotEmpty
-        ? result.map((row) => Product.fromMap(row)).toList()
+
+    final result = await db.rawQuery('''
+    SELECT 
+      p.id AS product_id, 
+      p.name AS product_name,
+      p.description AS product_description,
+      p.image AS product_image,
+      p.price AS product_price,
+      p.stock AS product_stock,
+      p.userId AS user_id,
+      u.id AS user_id, 
+      u.username AS user_username, 
+      u.email AS user_email, 
+      u.role AS user_role
+    FROM ${ProductTable.PRODUCTS_TABLE} p
+    INNER JOIN ${UserTable.USERS_TABLE} u
+    ON p.${ProductTable.PRODUCTS_USER_ID} = u.${UserTable.USERS_ID}
+    WHERE p.${ProductTable.PRODUCTS_ID} = ?
+  ''', [productId]);
+
+    List<ProductDetail> productDetail = result.isNotEmpty
+        ? result.map((row) => ProductDetail.fromQueryRow(row)).toList()
         : [];
-    return products.isNotEmpty ? products[0] : Product.empty();
+    return productDetail.isNotEmpty ? productDetail[0] : ProductDetail.empty();
+  }
+
+  Future<List<ProductDetail>> getProductsByUserId(int userId) async {
+    final db = await dbProvider.database;
+
+    final result = await db.rawQuery('''
+    SELECT 
+      p.id AS product_id, 
+      p.name AS product_name,
+      p.description AS product_description,
+      p.image AS product_image,
+      p.price AS product_price,
+      p.stock AS product_stock,
+      p.userId AS user_id,
+      u.id AS user_id, 
+      u.username AS user_username, 
+      u.email AS user_email, 
+      u.role AS user_role
+    FROM ${ProductTable.PRODUCTS_TABLE} p
+    INNER JOIN ${UserTable.USERS_TABLE} u
+    ON p.${ProductTable.PRODUCTS_USER_ID} = u.${UserTable.USERS_ID}
+    WHERE p.${ProductTable.PRODUCTS_USER_ID} = ?
+  ''', [userId]);
+
+    return result.map((row) => ProductDetail.fromQueryRow(row)).toList();
   }
 
   Future<bool> updateProduct(Product product) async {

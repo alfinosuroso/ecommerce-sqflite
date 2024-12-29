@@ -23,8 +23,15 @@ class User {
         role: json['role'],
       );
 
-  // Convert to Map
+  factory User.fromQueryRow(Map<String, dynamic> row) => User(
+        id: row['user_id'] as int?,
+        username: row['user_username'] as String,
+        email: row['user_email'] as String,
+        password: '',
+        role: row['user_role'] as String,
+      );
 
+  // Convert to Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,

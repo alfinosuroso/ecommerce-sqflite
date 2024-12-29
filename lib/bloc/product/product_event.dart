@@ -21,11 +21,11 @@ class GetProducts extends ProductEvent {
   List<Object> get props => [];
 }
 
-class GetProductsBySellerId extends ProductEvent {
-  final int sellerId;
-  const GetProductsBySellerId(this.sellerId);
+class GetProductsByUserId extends ProductEvent {
+  final int userId;
+  const GetProductsByUserId(this.userId);
   @override
-  List<Object> get props => [sellerId];
+  List<Object> get props => [userId];
 }
 
 class GetProductById extends ProductEvent {

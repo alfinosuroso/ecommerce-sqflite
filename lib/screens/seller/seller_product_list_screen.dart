@@ -1,9 +1,13 @@
+import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
+import 'package:ecommerce_sqflite/models/product_detail.dart';
+import 'package:ecommerce_sqflite/models/user.dart';
+import 'package:ecommerce_sqflite/services/dao/product_dao.dart';
 import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
@@ -11,6 +15,7 @@ import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SellerProductListScreen extends StatefulWidget {
   const SellerProductListScreen({super.key});
@@ -21,13 +26,30 @@ class SellerProductListScreen extends StatefulWidget {
 }
 
 class _SellerProductListScreenState extends State<SellerProductListScreen> {
+  List<ProductDetail> products = [];
+  User? user = AuthService.getUser();
   String _selectedSortingOption = 'A-Z';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
-      body: _buildBody(context),
+      body: BlocProvider(
+        create: (context) =>
+            ProductBloc(ProductDao())..add(GetProductsByUserId(user!.id!)),
+        child: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            if (state is ProductLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is ProductLoaded) {
+              products = state.products;
+              return _buildBody(context, products);
+            }
+            return const Text("Terjadi Kesalahan Pada Database");
+          },
+        ),
+      ),
       floatingActionButton: _buildFab(context),
     );
   }
@@ -41,7 +63,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, List<ProductDetail> products) {
     return Padding(
       padding: Dimen.defaultPadding,
       child: Column(
@@ -50,7 +72,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
           _filterSortingButton(),
           Dimen.verticalSpaceMedium,
           Expanded(
-            child: _productGrid(context),
+            child: _productGrid(context, products),
           ),
         ],
       ),
@@ -77,18 +99,20 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-  Widget _productGrid(BuildContext context) {
-    return GridView.builder(
-      itemCount: 10,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemBuilder: (context, index) {
-        return _productItem(context, index);
-      },
-    );
+  Widget _productGrid(BuildContext context, List<ProductDetail> products) {
+    return products.isEmpty
+        ? const Center(child: Text("Belum ada produk"))
+        : GridView.builder(
+            itemCount: products.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) {
+              return _productItem(context, index);
+            },
+          );
   }
 
   Widget _productItem(
@@ -142,7 +166,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
                                 image: "assets/images/sample-1.jpeg",
                                 price: 20000,
                                 stock: 10,
-                                sellerId: 1));
+                                userId: 1));
                       },
                       child: const Text("Edit"))),
               Dimen.horizontalSpaceMedium,
@@ -167,7 +191,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
       actions: [
         IconButton(
           onPressed: () async {
-            await AuthService().clearUser();
+            await AuthService.clearUser();
             SharedCode(context).successSnackBar(text: "Berhasil logout");
             context.read<UserBloc>().add(CheckUser());
           },

@@ -1,10 +1,15 @@
+import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/main.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
+import 'package:ecommerce_sqflite/models/user.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   Product? product;
@@ -21,6 +26,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   final TextEditingController _priceController = TextEditingController();
   // String _image = "assets/images/sample-1.jpeg";
   String _image = "";
+  User? user = AuthService.getUser();
 
   @override
   void initState() {
@@ -30,7 +36,6 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
       _stockController.text = widget.product!.stock.toString();
       _priceController.text = widget.product!.price.toString();
       _image = widget.product!.image;
-      
     }
     super.initState();
   }
@@ -39,18 +44,29 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Padding(
       padding: Dimen.defaultPadding,
       child: Column(
         children: [
           _formBody(),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              debugPrint("sample menambahkan data");
+              context.read<ProductBloc>().add(AddProduct(Product(
+                    name: _nameController.text,
+                    description: _descriptionController.text,
+                    stock: int.parse(_stockController.text),
+                    price: double.parse(_priceController.text),
+                    image: _image,
+                    userId: user!.id!,
+                  )));
+              debugPrint("berhasil menambahkan data");
+            },
             child:
                 Text(widget.product == null ? "Tambah Produk" : "Edit Produk"),
           ),
@@ -94,6 +110,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
             CustomTextFormField(
               controller: _stockController,
               title: "Stok Produk",
+              keyboardType: TextInputType.number,
             ),
             CustomTextFormField(
               controller: _priceController,

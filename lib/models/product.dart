@@ -6,16 +6,16 @@ class Product {
   final String image;
   final double price;
   final int stock;
-  final int sellerId; // Foreign key to the User (Seller)
+  final int userId; // Foreign key to the User (Seller)
 
   Product({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
     required this.image,
     required this.price,
     required this.stock,
-    required this.sellerId,
+    required this.userId,
   });
 
   // Convert from Map
@@ -26,7 +26,18 @@ class Product {
         image: json['image'],
         price: json['price'],
         stock: json['stock'],
-        sellerId: json['sellerId'],
+        userId: json['userId'],
+      );
+
+  // Convert from Query Row (with aliases)
+  factory Product.fromQueryRow(Map<String, dynamic> row) => Product(
+        id: row['product_id'] as int?,
+        name: row['product_name'] as String,
+        description: row['product_description'] as String,
+        image: row['product_image'] as String,
+        price: (row['product_price'] as num).toDouble(),
+        stock: row['product_stock'] as int,
+        userId: row['user_id'] as int,
       );
 
   // Convert to Map
@@ -38,7 +49,7 @@ class Product {
       'image': image,
       'price': price,
       'stock': stock,
-      'sellerId': sellerId
+      'userId': userId
     };
   }
 
@@ -50,5 +61,5 @@ class Product {
             image: '',
             price: 0.0,
             stock: 0,
-            sellerId: 0);
+            userId: 0);
 }

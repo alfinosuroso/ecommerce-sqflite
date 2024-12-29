@@ -10,8 +10,7 @@ part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserDao userDao;
-  final AuthService authService;
-  UserBloc(this.userDao, this.authService) : super(UserInitial()) {
+  UserBloc(this.userDao) : super(UserInitial()) {
     on<LoginUser>((event, emit) async {
       emit(UserLoading());
       try {
@@ -20,7 +19,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         debugPrint(user.toString());
         if (user.id != null) {
           debugPrint("masuk if");
-          await authService.storeUser(user);
+          await AuthService.storeUser(user);
           emit(const UserSuccess("Login berhasil"));
           emit(UserByIdLoaded(user));
         } else {
@@ -47,10 +46,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserError(e.toString()));
       }
     });
-    on<CheckUser>((event, emit) async {
+    on<CheckUser>((event, emit) {
       emit(UserLoading());
       try {
-        final user = await authService.getUser();
+        final user = AuthService.getUser();
         if (user != null) {
           emit(UserByIdLoaded(user));
         }
