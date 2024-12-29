@@ -2,8 +2,6 @@ import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
-import 'package:ecommerce_sqflite/services/dao/user_dao.dart';
-import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';

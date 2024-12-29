@@ -1,7 +1,6 @@
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
-import 'package:ecommerce_sqflite/main.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/models/user.dart';
 import 'package:ecommerce_sqflite/services/session/auth_service.dart';

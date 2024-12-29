@@ -1,7 +1,6 @@
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
-import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/router/AppRouter.dart';
 import 'package:ecommerce_sqflite/services/dao/product_dao.dart';
 import 'package:ecommerce_sqflite/services/dao/user_dao.dart';

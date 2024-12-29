@@ -2,8 +2,6 @@ import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';
-import 'package:ecommerce_sqflite/services/dao/user_dao.dart';
-import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
