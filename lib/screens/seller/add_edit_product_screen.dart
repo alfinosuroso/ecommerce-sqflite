@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
@@ -9,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   Product? product;
@@ -37,6 +41,34 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
       _image = widget.product!.image;
     }
     super.initState();
+  }
+
+  Future<void> _pickImage() async {
+    PermissionStatus permissionStatusExternal =
+        await Permission.manageExternalStorage.request();
+    if (permissionStatusExternal.isGranted) {
+      _setPickImage();
+    } else {
+      PermissionStatus permissionStatus = await Permission.storage.request();
+
+      if (permissionStatus.isGranted) {
+        _setPickImage();
+      } else {
+        print("Permission denied. Please enable storage permission.");
+      }
+    }
+  }
+
+  _setPickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _image = pickedImage.path;
+      });
+    }
   }
 
   @override
@@ -81,7 +113,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: () {},
+              onTap: _pickImage,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(Dimen.radius),
                 child: Container(
@@ -92,7 +124,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                       ? const Center(
                           child:
                               const FaIcon(FontAwesomeIcons.folder, size: 50))
-                      : Image.asset(_image, fit: BoxFit.cover),
+                      : Image.file(File(_image), fit: BoxFit.cover),
                 ),
               ),
             ),
