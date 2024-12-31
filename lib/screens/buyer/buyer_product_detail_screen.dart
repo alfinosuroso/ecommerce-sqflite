@@ -1,19 +1,19 @@
+import 'dart:io';
+
+import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/models/product_detail.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:go_router/go_router.dart';
 
-class BuyerProductDetailScreen extends StatefulWidget {
-  const BuyerProductDetailScreen({super.key});
+class BuyerProductDetailScreen extends StatelessWidget {
+  ProductDetail productDetail;
+  BuyerProductDetailScreen({required this.productDetail, super.key});
 
-  @override
-  State<BuyerProductDetailScreen> createState() =>
-      _BuyerProductDetailScreenState();
-}
-
-class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +23,7 @@ class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-  return Column(
+    return Column(
       children: [
         Expanded(child: _topBody(context)),
         _bottomBody(context),
@@ -46,7 +46,7 @@ class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Rp. 50000", 
+            SharedCode(context).formatToNumber(productDetail.product.price),
             style: Theme.of(context)
                 .textTheme
                 .titleLarge
@@ -55,8 +55,14 @@ class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
           Dimen.horizontalSpaceMedium,
           Expanded(
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: productDetail.product.stock == 0
+                      ? AppColors.grey
+                      : AppThemeData.getTheme(context).primaryColor),
               onPressed: () {},
-              child: const Text("Tambahkan ke Keranjang"),
+              child: Text(productDetail.product.stock == 0
+                  ? "Stok Habis"
+                  : "Tambahkan ke Keranjang"),
             ),
           ),
         ],
@@ -73,9 +79,9 @@ class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
             borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(Dimen.mediumRadius),
                 bottomRight: Radius.circular(Dimen.mediumRadius)),
-            child: Image.asset(
-              "assets/images/sample-1.jpeg",
-              fit: BoxFit.cover,
+            child: Image.file(
+              File(productDetail.product.image),
+              fit: BoxFit.contain,
               width: double.infinity,
               height: 40.h,
             ),
@@ -85,15 +91,24 @@ class _BuyerProductDetailScreenState extends State<BuyerProductDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Product Name Long Long ",
+                Text(productDetail.product.name,
                     style: Theme.of(context).textTheme.titleLarge),
                 Dimen.verticalSpaceSmall,
-                Chip(label: Text("Tersedia: 100")),
+                Chip(
+                    label:
+                        Text("Stok tersedia: ${productDetail.product.stock}")),
                 Dimen.verticalSpaceSmall,
                 const LineSpacing(),
                 Dimen.verticalSpaceSmall,
-                const Text(
-                    "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc. But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to"),
+                Text("Nama Toko:",
+                    style: Theme.of(context).textTheme.titleMedium),
+                Text(productDetail.user.username),
+                Dimen.verticalSpaceSmall,
+                const LineSpacing(thickness: 1.0),
+                Dimen.verticalSpaceSmall,
+                Text("Deskripsi Produk:",
+                    style: Theme.of(context).textTheme.titleMedium),
+                Text(productDetail.product.description),
                 Dimen.verticalSpaceSmall,
               ],
             ),

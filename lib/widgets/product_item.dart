@@ -29,10 +29,10 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         user!.role == "Penjual"
             ? context.go("/product-seller/details")
-            : context.go("/product-buyer/details");
+            : context.push("/product-buyer/details", extra: productDetail);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

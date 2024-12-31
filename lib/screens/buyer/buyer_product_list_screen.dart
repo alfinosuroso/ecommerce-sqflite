@@ -26,7 +26,7 @@ class BuyerProductListScreen extends StatefulWidget {
 class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
   List<ProductDetail> _products = [];
   final User? _user = AuthService.getUser();
-  String _selectedSortingOption = 'A-Z';
+  String _selectedSortingOption = '';
   final ValueNotifier<bool> _triggerProduct = ValueNotifier(true);
   final ValueNotifier<bool> _triggerFilter = ValueNotifier(true);
   final TextEditingController _searchController = TextEditingController();
@@ -63,13 +63,12 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
                     newProducts: _products,
                     oldProducts: state.products);
                 _triggerProduct.value = !_triggerProduct.value;
-              } else if (_selectedSortingOption != "A-Z") {
-                _products = ProductUtils(context).filterProducts(
-                  query: _selectedSortingOption,
-                  products: _products,
-                );
-                _triggerProduct.value = !_triggerProduct.value;
               }
+              _products = ProductUtils(context).filterProducts(
+                query: _selectedSortingOption,
+                products: _products,
+              );
+              _triggerProduct.value = !_triggerProduct.value;
 
               return _buildBody(context, state.products);
             }
@@ -220,10 +219,10 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            _selectedSortingOption = "A-Z";
+                            _selectedSortingOption = "";
                             _products = ProductUtils(context).filterProducts(
                               query: _selectedSortingOption,
-                              products: _products,
+                              products: productList,
                             );
                             _triggerFilter.value = !_triggerFilter.value;
                             _triggerProduct.value = !_triggerProduct.value;
