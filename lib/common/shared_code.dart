@@ -1,6 +1,7 @@
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SharedCode {
   final BuildContext context;
@@ -54,5 +55,10 @@ class SharedCode {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  String formatToNumber(int price) {
+    return NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0)
+        .format(price);
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/models/user.dart';
 import 'package:ecommerce_sqflite/services/session/auth_service.dart';
@@ -13,6 +15,7 @@ import 'package:sizer/sizer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:go_router/go_router.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   Product? product;
@@ -30,6 +33,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   // String _image = "assets/images/sample-1.jpeg";
   String _image = "";
   User? user = AuthService.getUser();
+  final _formAddKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -43,26 +47,58 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     super.initState();
   }
 
-  Future<void> _pickImage() async {
-    PermissionStatus permissionStatusExternal =
-        await Permission.manageExternalStorage.request();
-    if (permissionStatusExternal.isGranted) {
-      _setPickImage();
-    } else {
-      PermissionStatus permissionStatus = await Permission.storage.request();
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _stockController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
 
-      if (permissionStatus.isGranted) {
+  Future<void> _pickImage() async {
+    if (Platform.isAndroid) {
+      if (await _handleAndroidPermissions()) {
         _setPickImage();
       } else {
-        print("Permission denied. Please enable storage permission.");
+        print("Permission denied. Please enable storage/media permissions.");
       }
     }
   }
 
+  Future<bool> _handleAndroidPermissions() async {
+    // Check if the SDK version is greater than or equal to 34
+    if (Platform.isAndroid && (await _androidSDKVersion()) >= 34) {
+      PermissionStatus permissionStatus =
+          await Permission.mediaLibrary.request();
+
+      if (permissionStatus.isGranted) {
+        return true;
+      }
+    }
+
+    if (Platform.isAndroid && (await _androidSDKVersion()) >= 33) {
+      PermissionStatus permissionStatus = await Permission.photos.request();
+
+      if (permissionStatus.isGranted) {
+        return true;
+      }
+    }
+
+    PermissionStatus permissionStatusStorage =
+        await Permission.storage.request();
+    return permissionStatusStorage.isGranted;
+  }
+
+  Future<int> _androidSDKVersion() async {
+    final version = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+    return version;
+  }
+
   _setPickImage() async {
-    final ImagePicker _picker = ImagePicker();
+    final ImagePicker picker = ImagePicker();
     final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
+        await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       setState(() {
@@ -82,26 +118,39 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   Widget _buildBody(BuildContext context) {
     return Padding(
       padding: Dimen.defaultPadding,
-      child: Column(
-        children: [
-          _formBody(),
-          ElevatedButton(
-            onPressed: () {
-              debugPrint("sample menambahkan data");
-              context.read<ProductBloc>().add(AddProduct(Product(
-                    name: _nameController.text,
-                    description: _descriptionController.text,
-                    stock: int.parse(_stockController.text),
-                    price: double.parse(_priceController.text),
-                    image: _image,
-                    userId: user!.id!,
-                  )));
-              debugPrint("berhasil menambahkan data");
-            },
-            child:
-                Text(widget.product == null ? "Tambah Produk" : "Edit Produk"),
-          ),
-        ],
+      child: Form(
+        key: _formAddKey,
+        child: Column(
+          children: [
+            _formBody(),
+            ElevatedButton(
+              onPressed: () {
+                if (_image.isEmpty) {
+                  SharedCode(context).errorSnackBar(
+                      text: "Silahkan pilih gambar terlebih dahulu");
+                } else if (_formAddKey.currentState!.validate()) {
+                  context.read<ProductBloc>().add(AddProduct(Product(
+                        name: _nameController.text,
+                        description: _descriptionController.text,
+                        stock: int.parse(_stockController.text),
+                        price: int.parse(_priceController.text),
+                        image: _image,
+                        userId: user!.id!,
+                      )));
+                  debugPrint("berhasil menambahkan data");
+                  SharedCode(context)
+                      .successSnackBar(text: "Berhasil tambah data");
+                  context.pop(true);
+                } else {
+                  SharedCode(context)
+                      .errorSnackBar(text: "Gagal menambahkan data");
+                }
+              },
+              child: Text(
+                  widget.product == null ? "Tambah Produk" : "Edit Produk"),
+            ),
+          ],
+        ),
       ),
     );
   }

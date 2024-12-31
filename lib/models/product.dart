@@ -4,7 +4,7 @@ class Product {
   final String name;
   final String description;
   final String image;
-  final double price;
+  final int price;
   final int stock;
   final int userId; // Foreign key to the User (Seller)
 
@@ -35,7 +35,7 @@ class Product {
         name: row['product_name'] as String,
         description: row['product_description'] as String,
         image: row['product_image'] as String,
-        price: (row['product_price'] as num).toDouble(),
+        price: row['product_price'] as int,
         stock: row['product_stock'] as int,
         userId: row['user_id'] as int,
       );
@@ -59,7 +59,7 @@ class Product {
             name: '',
             description: '',
             image: '',
-            price: 0.0,
+            price: 0,
             stock: 0,
             userId: 0);
 }

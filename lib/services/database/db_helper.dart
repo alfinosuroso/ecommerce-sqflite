@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 class DBHelper {
   static final DBHelper dbProvider = DBHelper();
   static const DATABASE_NAME = "ecommerce_sqflite.db";
-  static const DATABASE_VERSION = 1;
+  static const DATABASE_VERSION = 2;
 
   static Database? _database;
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
@@ -31,12 +33,12 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: BlocProvider(
-        create: (context) =>
-            ProductBloc(ProductDao())..add(GetProductsByUserId(user!.id!)),
-        child: BlocBuilder<ProductBloc, ProductState>(
+    return BlocProvider(
+      create: (context) =>
+          ProductBloc(ProductDao())..add(GetProductsByUserId(user!.id!)),
+      child: Scaffold(
+        appBar: _buildAppBar(context),
+        body: BlocBuilder<ProductBloc, ProductState>(
           builder: (context, state) {
             if (state is ProductLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -48,17 +50,8 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             return const Text("Terjadi Kesalahan Pada Database");
           },
         ),
+        // floatingActionButton: _buildFab(context),
       ),
-      floatingActionButton: _buildFab(context),
-    );
-  }
-
-  FloatingActionButton _buildFab(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        context.go("/product-seller/add-edit");
-      },
-      child: const Icon(Icons.add),
     );
   }
 
@@ -70,12 +63,27 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
           _searchBar(),
           _filterSortingButton(),
           Dimen.verticalSpaceMedium,
-          Expanded(
-            child: _productGrid(context, products),
-          ),
+          Expanded(child: _productGrid(context, products)),
+          Dimen.verticalSpaceMedium,
+          _addButton(context),
         ],
       ),
     );
+  }
+
+  Widget _addButton(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () async {
+          final bool? isAdded = await context.push("/product-seller/add-edit");
+          if (isAdded == true) {
+            debugPrint("added");
+            context.read<ProductBloc>().add(GetProductsByUserId(user!.id!));
+            debugPrint("get products");
+          } else {
+            debugPrint("not added");
+          }
+        },
+        child: const Text("Tambah data"));
   }
 
   Widget _searchBar() {
@@ -100,7 +108,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
 
   Widget _productGrid(BuildContext context, List<ProductDetail> products) {
     return products.isEmpty
-        ? const Center(child: Text("Belum ada produk"))
+        ? const Expanded(child: Center(child: Text("Belum ada produk")))
         : GridView.builder(
             itemCount: products.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -109,7 +117,12 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
               mainAxisSpacing: 10,
             ),
             itemBuilder: (context, index) {
-              return _productItem(context, index);
+              ProductDetail productDetail = products[index];
+              return _productItem(
+                context,
+                index,
+                productDetail,
+              );
             },
           );
   }
@@ -117,6 +130,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
   Widget _productItem(
     BuildContext context,
     int index,
+    ProductDetail productDetail,
   ) {
     return InkWell(
       onTap: () {
@@ -128,23 +142,20 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(Dimen.radius),
-              child: Image.asset(
-                "assets/images/sample-1.jpeg",
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
+              child: Image.file(File(productDetail.product.image),
+                  width: double.infinity, fit: BoxFit.cover),
             ),
           ),
           Dimen.verticalSpaceSmall,
           Text(
-            "Product Name LongLongLongLong",
+            productDetail.product.name,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey,
                 ),
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "Rp. 50000",
+            SharedCode(context).formatToNumber(productDetail.product.price),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: AppThemeData.getTheme(context).primaryColor,
                 ),
@@ -157,15 +168,18 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
               Expanded(
                   child: ElevatedButton(
                       onPressed: () {
-                        context.go("/product-seller/add-edit",
-                            extra: Product(
-                                id: 0,
-                                name: "name",
-                                description: "description",
-                                image: "assets/images/sample-1.jpeg",
-                                price: 20000,
-                                stock: 10,
-                                userId: 1));
+                        context.go(
+                          "/product-seller/add-edit",
+                          extra: Product(
+                            id: productDetail.product.id,
+                            name: productDetail.product.name,
+                            description: productDetail.product.description,
+                            image: productDetail.product.image,
+                            price: productDetail.product.price,
+                            stock: productDetail.product.stock,
+                            userId: productDetail.user.id!,
+                          ),
+                        );
                       },
                       child: const Text("Edit"))),
               Dimen.horizontalSpaceMedium,
@@ -194,8 +208,8 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             SharedCode(context).successSnackBar(text: "Berhasil logout");
             context.read<UserBloc>().add(CheckUser());
           },
-          icon: const Icon(Icons.logout),
-        )
+          icon: const Icon(Icons.logout, color: AppColors.red),
+        ),
       ],
     );
   }
