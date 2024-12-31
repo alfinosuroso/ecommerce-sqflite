@@ -21,24 +21,32 @@ class ProductUtils {
     return newProducts;
   }
 
-  List<ProductDetail> filterProducts(
-      {required String query,
-      required List<ProductDetail> newProducts,
-      required List<ProductDetail> oldProducts}) {
+  List<ProductDetail> filterProducts({
+    required String query,
+    required List<ProductDetail> products,
+  }) {
+    List<ProductDetail> newProducts;
     switch (query) {
       case 'A-Z':
-        newProducts = oldProducts;
+        newProducts = products
+          ..sort((a, b) => a.product.name.compareTo(b.product.name));
         break;
       case 'Z-A':
-        newProducts = oldProducts.reversed.toList();
+        newProducts = products
+          ..sort((a, b) => b.product.name.compareTo(a.product.name));
         break;
       case "High-Low":
-        newProducts = oldProducts
+        newProducts = products
           ..sort((a, b) => b.product.price.compareTo(a.product.price));
         break;
       case "Low-High":
-        newProducts = oldProducts
+        newProducts = products
           ..sort((a, b) => a.product.price.compareTo(b.product.price));
+        break;
+      default:
+        // sort by id
+        newProducts = products
+          ..sort((a, b) => a.product.id!.compareTo(b.product.id!));
         break;
     }
     return newProducts;

@@ -1,20 +1,16 @@
-import 'dart:io';
-
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
-import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/product_utils.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
-import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/models/product_detail.dart';
 import 'package:ecommerce_sqflite/models/user.dart';
 import 'package:ecommerce_sqflite/services/dao/product_dao.dart';
 import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
-import 'package:ecommerce_sqflite/widgets/primary_text_button.dart';
+import 'package:ecommerce_sqflite/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -28,19 +24,19 @@ class SellerProductListScreen extends StatefulWidget {
 }
 
 class _SellerProductListScreenState extends State<SellerProductListScreen> {
-  List<ProductDetail> products = [];
+  List<ProductDetail> _products = [];
   final User? _user = AuthService.getUser();
-  String _selectedSortingOption = 'A-Z';
+  String _selectedSortingOption = '';
   final ValueNotifier<bool> _triggerProduct = ValueNotifier(true);
   final ValueNotifier<bool> _triggerFilter = ValueNotifier(true);
   final TextEditingController _searchController = TextEditingController();
 
-  //dispose all controller
   @override
   void dispose() {
     super.dispose();
     _triggerProduct.dispose();
     _searchController.dispose();
+    _triggerFilter.dispose();
   }
 
   @override
@@ -66,20 +62,20 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             if (state is ProductLoaded) {
               debugPrint('build loaded');
 
-              products.clear();
-              products.addAll(state.products);
+              _products.clear();
+              _products.addAll(state.products);
 
               if (_searchController.text.isNotEmpty) {
-                products = ProductUtils(context).searchProducts(
+                _products = ProductUtils(context).searchProducts(
                     query: _searchController.text,
-                    newProducts: products,
+                    newProducts: _products,
                     oldProducts: state.products);
                 _triggerProduct.value = !_triggerProduct.value;
-              } else if (_selectedSortingOption != "A-Z") {
-                products = ProductUtils(context).filterProducts(
-                    query: _selectedSortingOption,
-                    newProducts: products,
-                    oldProducts: state.products);
+              } else if (_selectedSortingOption != "") {
+                _products = ProductUtils(context).filterProducts(
+                  query: _selectedSortingOption,
+                  products: _products,
+                );
                 _triggerProduct.value = !_triggerProduct.value;
               }
 
@@ -99,13 +95,13 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
       child: Column(
         children: [
           _searchBar(productList),
-          _filterSortingButton(productList),
+          _filterSortingButton(context, productList),
           Dimen.verticalSpaceMedium,
           ValueListenableBuilder(
             valueListenable: _triggerProduct,
             builder: (context, __, ___) {
               debugPrint("trigger");
-              debugPrint("product: $products");
+              debugPrint("product: $_products");
               return Expanded(child: _productGrid(context));
             },
           ),
@@ -140,9 +136,9 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
       ),
       controller: _searchController,
       onChanged: (value) {
-        products = ProductUtils(context).searchProducts(
+        _products = ProductUtils(context).searchProducts(
           query: _searchController.text,
-          newProducts: products,
+          newProducts: _products,
           oldProducts: productList,
         );
         _triggerProduct.value = !_triggerProduct.value;
@@ -151,135 +147,13 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-  Widget _filterSortingButton(List<ProductDetail> productList) {
+  Widget _filterSortingButton(
+      BuildContext context, List<ProductDetail> productList) {
     return OutlinedButton(
       onPressed: () {
         _showFilterSortingSheet(context, productList);
       },
       child: const Text("Filter & Sorting"),
-    );
-  }
-
-  Widget _productGrid(BuildContext context) {
-    return products.isEmpty
-        ? const Center(child: Text("Belum ada produk"))
-        : GridView.builder(
-            itemCount: products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              ProductDetail productDetail = products[index];
-              return _productItem(
-                context,
-                index,
-                productDetail,
-              );
-            },
-          );
-  }
-
-  Widget _productItem(
-    BuildContext context,
-    int index,
-    ProductDetail productDetail,
-  ) {
-    return InkWell(
-      onTap: () {
-        // context.go("/product-buyer/details");
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Dimen.radius),
-              child: Image.file(File(productDetail.product.image),
-                  width: double.infinity, fit: BoxFit.cover),
-            ),
-          ),
-          Dimen.verticalSpaceSmall,
-          Text(
-            productDetail.product.name,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey,
-                ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            SharedCode(context).formatToNumber(productDetail.product.price),
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppThemeData.getTheme(context).primaryColor,
-                ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Dimen.verticalSpaceSmall,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                  child: ElevatedButton(
-                      onPressed: () async {
-                        final bool? isEdited = await context.push(
-                          "/product-seller/add-edit",
-                          extra: Product(
-                            id: productDetail.product.id,
-                            name: productDetail.product.name,
-                            description: productDetail.product.description,
-                            image: productDetail.product.image,
-                            price: productDetail.product.price,
-                            stock: productDetail.product.stock,
-                            userId: productDetail.user.id!,
-                          ),
-                        );
-                        if (isEdited == true) {
-                          debugPrint("edited");
-                          context
-                              .read<ProductBloc>()
-                              .add(GetProductsByUserId(_user!.id!));
-                        } else {
-                          debugPrint("not edited");
-                        }
-                      },
-                      child: const Text("Edit"))),
-              Dimen.horizontalSpaceMedium,
-              PrimaryTextButton(
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(color: AppColors.darkRed),
-                onPressed: () {
-                  context
-                      .read<ProductBloc>()
-                      .add(DeleteProduct(productDetail.product.id!));
-                  context
-                      .read<ProductBloc>()
-                      .add(GetProductsByUserId(_user!.id!));
-                },
-                title: "Hapus",
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: const Text("List Produk"),
-      actions: [
-        IconButton(
-          onPressed: () async {
-            await AuthService.clearUser();
-            SharedCode(context).successSnackBar(text: "Berhasil logout");
-            context.read<UserBloc>().add(CheckUser());
-          },
-          icon: const Icon(Icons.logout, color: AppColors.red),
-        ),
-      ],
     );
   }
 
@@ -330,12 +204,12 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
                         Expanded(
                             child: OutlinedButton(
                                 onPressed: () {
-                                  _selectedSortingOption = "A-Z";
-                                  products = ProductUtils(context)
-                                      .filterProducts(
-                                          query: _selectedSortingOption,
-                                          newProducts: products,
-                                          oldProducts: productList);
+                                  _selectedSortingOption = "";
+                                  _products =
+                                      ProductUtils(context).filterProducts(
+                                    query: _selectedSortingOption,
+                                    products: productList,
+                                  );
                                   _triggerFilter.value = !_triggerFilter.value;
                                   _triggerProduct.value =
                                       !_triggerProduct.value;
@@ -346,11 +220,11 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
                         Expanded(
                             child: ElevatedButton(
                                 onPressed: () {
-                                  products = ProductUtils(context)
-                                      .filterProducts(
-                                          query: _selectedSortingOption,
-                                          newProducts: products,
-                                          oldProducts: productList);
+                                  _products =
+                                      ProductUtils(context).filterProducts(
+                                    query: _selectedSortingOption,
+                                    products: _products,
+                                  );
                                   _triggerProduct.value =
                                       !_triggerProduct.value;
                                   Navigator.pop(context);
@@ -366,37 +240,68 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-/*************  ✨ Codeium Command ⭐  *************/
-  /// A widget that builds a sorting option
-  ///
-  /// The widget will render a radio list tile with the given title and value.
-  /// The value of the radio list tile is stored in the _selectedSortingOption
-  /// variable. When the value of the radio list tile is changed, the value of
-
-/******  0f04243b-5a01-4778-9b8a-a99389c12b8c  *******/
   Widget _buildSortingOption(BuildContext context, String title, String value) {
     return Container(
-        padding: Dimen.verticalPaddingSmall,
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.black12, width: 2.0),
-          ),
+      padding: Dimen.verticalPaddingSmall,
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.black12, width: 2.0),
         ),
-        child: Column(
-          children: [
-            RadioListTile<String>(
-              title: Text(
-                title,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              value: value,
-              groupValue: _selectedSortingOption,
-              onChanged: (String? newValue) {
-                _selectedSortingOption = newValue!;
-                _triggerFilter.value = !_triggerFilter.value;
-              },
+      ),
+      child: Column(
+        children: [
+          RadioListTile<String>(
+            title: Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ],
-        ));
+            value: value,
+            groupValue: _selectedSortingOption,
+            onChanged: (String? newValue) {
+              _selectedSortingOption = newValue!;
+              _triggerFilter.value = !_triggerFilter.value;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _productGrid(BuildContext context) {
+    return _products.isEmpty
+        ? const Center(child: Text("Belum ada produk"))
+        : GridView.builder(
+            itemCount: _products.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) {
+              ProductDetail productDetail = _products[index];
+              return ProductItem(
+                context: context,
+                index: index,
+                productDetail: productDetail,
+                user: _user,
+              );
+            },
+          );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text("List Produk"),
+      actions: [
+        IconButton(
+          onPressed: () async {
+            await AuthService.clearUser();
+            SharedCode(context).successSnackBar(text: "Berhasil logout");
+            context.read<UserBloc>().add(CheckUser());
+          },
+          icon: const Icon(Icons.logout, color: AppColors.red),
+        ),
+      ],
+    );
   }
 }
