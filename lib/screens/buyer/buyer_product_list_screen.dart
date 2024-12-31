@@ -1,8 +1,18 @@
+import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
+import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
+import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/models/product_detail.dart';
+import 'package:ecommerce_sqflite/models/user.dart';
+import 'package:ecommerce_sqflite/services/dao/product_dao.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:ecommerce_sqflite/widgets/custom_text_field.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 class BuyerProductListScreen extends StatefulWidget {
@@ -13,13 +23,22 @@ class BuyerProductListScreen extends StatefulWidget {
 }
 
 class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
+  List<ProductDetail> products = [];
+  final User? _user = AuthService.getUser();
   String _selectedSortingOption = 'A-Z';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildBody(context),
+    return BlocProvider(
+      create: (context) => ProductBloc(ProductDao())..add(GetProducts()),
+      child: Scaffold(
+        appBar: _buildAppBar(context),
+        body: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            return _buildBody(context);
+          },
+        ),
+      ),
     );
   }
 
@@ -121,8 +140,16 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
           onPressed: () {
             context.go("/product-buyer/cart");
           },
-          icon: const Icon(Icons.shopping_cart_checkout),
-        )
+          icon: const FaIcon(FontAwesomeIcons.cartShopping),
+        ),
+        IconButton(
+          onPressed: () async {
+            await AuthService.clearUser();
+            SharedCode(context).successSnackBar(text: "Berhasil logout");
+            context.read<UserBloc>().add(CheckUser());
+          },
+          icon: const Icon(Icons.logout, color: AppColors.red),
+        ),
       ],
     );
   }

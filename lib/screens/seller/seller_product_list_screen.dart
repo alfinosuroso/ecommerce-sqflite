@@ -5,6 +5,7 @@ import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/product_utils.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/models/product.dart';
 import 'package:ecommerce_sqflite/models/product_detail.dart';
@@ -28,24 +29,61 @@ class SellerProductListScreen extends StatefulWidget {
 
 class _SellerProductListScreenState extends State<SellerProductListScreen> {
   List<ProductDetail> products = [];
-  User? user = AuthService.getUser();
+  final User? _user = AuthService.getUser();
   String _selectedSortingOption = 'A-Z';
+  final ValueNotifier<bool> _triggerProduct = ValueNotifier(true);
+  final ValueNotifier<bool> _triggerFilter = ValueNotifier(true);
+  final TextEditingController _searchController = TextEditingController();
+
+  //dispose all controller
+  @override
+  void dispose() {
+    super.dispose();
+    _triggerProduct.dispose();
+    _searchController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          ProductBloc(ProductDao())..add(GetProductsByUserId(user!.id!)),
+          ProductBloc(ProductDao())..add(GetProductsByUserId(_user!.id!)),
       child: Scaffold(
         appBar: _buildAppBar(context),
-        body: BlocBuilder<ProductBloc, ProductState>(
+        body: BlocConsumer<ProductBloc, ProductState>(
+          listener: (context, state) {
+            if (state is ProductSuccess) {
+              SharedCode(context).successSnackBar(text: state.message);
+            }
+            if (state is ProductError) {
+              SharedCode(context).errorSnackBar(text: state.message);
+            }
+          },
           builder: (context, state) {
             if (state is ProductLoading) {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is ProductLoaded) {
-              products = state.products;
-              return _buildBody(context, products);
+              debugPrint('build loaded');
+
+              products.clear();
+              products.addAll(state.products);
+
+              if (_searchController.text.isNotEmpty) {
+                products = ProductUtils(context).searchProducts(
+                    query: _searchController.text,
+                    newProducts: products,
+                    oldProducts: state.products);
+                _triggerProduct.value = !_triggerProduct.value;
+              } else if (_selectedSortingOption != "A-Z") {
+                products = ProductUtils(context).filterProducts(
+                    query: _selectedSortingOption,
+                    newProducts: products,
+                    oldProducts: state.products);
+                _triggerProduct.value = !_triggerProduct.value;
+              }
+
+              return _buildBody(context, state.products);
             }
             return const Text("Terjadi Kesalahan Pada Database");
           },
@@ -55,15 +93,22 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, List<ProductDetail> products) {
+  Widget _buildBody(BuildContext context, List<ProductDetail> productList) {
     return Padding(
       padding: Dimen.defaultPadding,
       child: Column(
         children: [
-          _searchBar(),
-          _filterSortingButton(),
+          _searchBar(productList),
+          _filterSortingButton(productList),
           Dimen.verticalSpaceMedium,
-          Expanded(child: _productGrid(context, products)),
+          ValueListenableBuilder(
+            valueListenable: _triggerProduct,
+            builder: (context, __, ___) {
+              debugPrint("trigger");
+              debugPrint("product: $products");
+              return Expanded(child: _productGrid(context));
+            },
+          ),
           Dimen.verticalSpaceMedium,
           _addButton(context),
         ],
@@ -77,8 +122,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
           final bool? isAdded = await context.push("/product-seller/add-edit");
           if (isAdded == true) {
             debugPrint("added");
-            context.read<ProductBloc>().add(GetProductsByUserId(user!.id!));
-            debugPrint("get products");
+            context.read<ProductBloc>().add(GetProductsByUserId(_user!.id!));
           } else {
             debugPrint("not added");
           }
@@ -86,29 +130,39 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
         child: const Text("Tambah data"));
   }
 
-  Widget _searchBar() {
-    return const CustomTextFormField(
+  Widget _searchBar(List<ProductDetail> productList) {
+    return CustomTextFormField(
       title: null,
       hintText: "Cari nama produk...",
-      prefix: Icon(
+      prefix: const Icon(
         Icons.search,
         color: Colors.grey,
       ),
+      controller: _searchController,
+      onChanged: (value) {
+        products = ProductUtils(context).searchProducts(
+          query: _searchController.text,
+          newProducts: products,
+          oldProducts: productList,
+        );
+        _triggerProduct.value = !_triggerProduct.value;
+        return null;
+      },
     );
   }
 
-  Widget _filterSortingButton() {
+  Widget _filterSortingButton(List<ProductDetail> productList) {
     return OutlinedButton(
       onPressed: () {
-        _showFilterSortingSheet(context);
+        _showFilterSortingSheet(context, productList);
       },
       child: const Text("Filter & Sorting"),
     );
   }
 
-  Widget _productGrid(BuildContext context, List<ProductDetail> products) {
+  Widget _productGrid(BuildContext context) {
     return products.isEmpty
-        ? const Expanded(child: Center(child: Text("Belum ada produk")))
+        ? const Center(child: Text("Belum ada produk"))
         : GridView.builder(
             itemCount: products.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -167,8 +221,8 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             children: [
               Expanded(
                   child: ElevatedButton(
-                      onPressed: () {
-                        context.go(
+                      onPressed: () async {
+                        final bool? isEdited = await context.push(
                           "/product-seller/add-edit",
                           extra: Product(
                             id: productDetail.product.id,
@@ -180,6 +234,14 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
                             userId: productDetail.user.id!,
                           ),
                         );
+                        if (isEdited == true) {
+                          debugPrint("edited");
+                          context
+                              .read<ProductBloc>()
+                              .add(GetProductsByUserId(_user!.id!));
+                        } else {
+                          debugPrint("not edited");
+                        }
                       },
                       child: const Text("Edit"))),
               Dimen.horizontalSpaceMedium,
@@ -188,7 +250,14 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
                     .textTheme
                     .labelLarge!
                     .copyWith(color: AppColors.darkRed),
-                onPressed: () {},
+                onPressed: () {
+                  context
+                      .read<ProductBloc>()
+                      .add(DeleteProduct(productDetail.product.id!));
+                  context
+                      .read<ProductBloc>()
+                      .add(GetProductsByUserId(_user!.id!));
+                },
                 title: "Hapus",
               ),
             ],
@@ -214,7 +283,8 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
     );
   }
 
-  void _showFilterSortingSheet(BuildContext context) {
+  void _showFilterSortingSheet(
+      BuildContext context, List<ProductDetail> productList) {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -222,51 +292,88 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(Dimen.radius)),
       ),
       builder: (context) {
-        return Padding(
-          padding: Dimen.defaultPadding,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(Dimen.mediumRadius),
-                    child: Container(
-                      width: 100,
-                      height: 5,
-                      color: Colors.grey[400],
-                    )),
-              ),
-              Dimen.verticalSpaceLarge,
-              Text(
-                'Filter and Sorting',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Dimen.verticalSpaceMedium,
-              const LineSpacing(),
-              _buildSortingOption(context, 'Naming by A-Z', 'A-Z'),
-              _buildSortingOption(context, 'Naming by Z-A', 'Z-A'),
-              _buildSortingOption(context, 'Price (High-Low)', 'High-Low'),
-              _buildSortingOption(context, 'Price (Low-High)', 'Low-High'),
-              Dimen.verticalSpaceMedium,
-              Row(
-                children: [
-                  Expanded(
-                      child: OutlinedButton(
-                          onPressed: () {}, child: const Text("Reset"))),
-                  Dimen.horizontalSpaceMedium,
-                  Expanded(
-                      child: ElevatedButton(
-                          onPressed: () {}, child: const Text("Terapkan")))
-                ],
-              ),
-            ],
-          ),
-        );
+        return ValueListenableBuilder(
+            valueListenable: _triggerFilter,
+            builder: (context, __, ___) {
+              return Padding(
+                padding: Dimen.defaultPadding,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(Dimen.mediumRadius),
+                          child: Container(
+                            width: 100,
+                            height: 5,
+                            color: Colors.grey[400],
+                          )),
+                    ),
+                    Dimen.verticalSpaceLarge,
+                    Text(
+                      'Filter and Sorting',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Dimen.verticalSpaceMedium,
+                    const LineSpacing(),
+                    _buildSortingOption(context, 'Naming by A-Z', 'A-Z'),
+                    _buildSortingOption(context, 'Naming by Z-A', 'Z-A'),
+                    _buildSortingOption(
+                        context, 'Price (High-Low)', 'High-Low'),
+                    _buildSortingOption(
+                        context, 'Price (Low-High)', 'Low-High'),
+                    Dimen.verticalSpaceMedium,
+                    Row(
+                      children: [
+                        Expanded(
+                            child: OutlinedButton(
+                                onPressed: () {
+                                  _selectedSortingOption = "A-Z";
+                                  products = ProductUtils(context)
+                                      .filterProducts(
+                                          query: _selectedSortingOption,
+                                          newProducts: products,
+                                          oldProducts: productList);
+                                  _triggerFilter.value = !_triggerFilter.value;
+                                  _triggerProduct.value =
+                                      !_triggerProduct.value;
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Reset"))),
+                        Dimen.horizontalSpaceMedium,
+                        Expanded(
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  products = ProductUtils(context)
+                                      .filterProducts(
+                                          query: _selectedSortingOption,
+                                          newProducts: products,
+                                          oldProducts: productList);
+                                  _triggerProduct.value =
+                                      !_triggerProduct.value;
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Terapkan")))
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            });
       },
     );
   }
 
+/*************  ✨ Codeium Command ⭐  *************/
+  /// A widget that builds a sorting option
+  ///
+  /// The widget will render a radio list tile with the given title and value.
+  /// The value of the radio list tile is stored in the _selectedSortingOption
+  /// variable. When the value of the radio list tile is changed, the value of
+
+/******  0f04243b-5a01-4778-9b8a-a99389c12b8c  *******/
   Widget _buildSortingOption(BuildContext context, String title, String value) {
     return Container(
         padding: Dimen.verticalPaddingSmall,
@@ -285,9 +392,8 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
               value: value,
               groupValue: _selectedSortingOption,
               onChanged: (String? newValue) {
-                setState(() {
-                  _selectedSortingOption = newValue!;
-                });
+                _selectedSortingOption = newValue!;
+                _triggerFilter.value = !_triggerFilter.value;
               },
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/sign_in_screen.dart';
@@ -11,7 +12,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint("sebelum bloc");
-    return BlocBuilder<UserBloc, UserState>(
+    return BlocConsumer<UserBloc, UserState>(
+      listener: (context, state) {
+        if (state is UserByIdLoaded) {
+          SharedCode(context)
+              .successSnackBar(text: "Welcome, ${state.user.username}!");
+        }
+      },
       builder: (context, state) {
         debugPrint("bloc builder");
         if (state is UserByIdLoaded) {

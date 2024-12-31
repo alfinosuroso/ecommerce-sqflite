@@ -38,9 +38,39 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       try {
         bool success = await ProductDao().insertProduct(event.product);
         if (success) {
-          emit(const ProductSuccess("Product berhasil ditambahkan"));
+          emit(const ProductSuccess("Produk berhasil ditambahkan"));
         } else {
-          emit(const ProductError("Product gagal ditambahkan"));
+          emit(const ProductError("Produk gagal ditambahkan"));
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(ProductError(e.toString()));
+      }
+    });
+
+    on<UpdateProduct>((event, emit) async {
+      emit(ProductLoading());
+      try {
+        bool success = await ProductDao().updateProduct(event.product);
+        if (success) {
+          emit(const ProductSuccess("Produk berhasil diupdate"));
+        } else {
+          emit(const ProductError("Produk gagal diupdate"));
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(ProductError(e.toString()));
+      }
+    });
+
+    on<DeleteProduct>((event, emit) async {
+      emit(ProductLoading());
+      try {
+        bool success = await ProductDao().deleteProduct(event.productId);
+        if (success) {
+          emit(const ProductSuccess("Produk berhasil dihapus"));
+        } else {
+          emit(const ProductError("Produk gagal dihapus"));
         }
       } catch (e) {
         debugPrint(e.toString());

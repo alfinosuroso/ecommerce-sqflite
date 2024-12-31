@@ -17,37 +17,6 @@ class ProductDao {
     return insertResult != 0;
   }
 
-  // BUYER
-  // Future<List<Product>> getProducts() async {
-  //   final db = await dbProvider.database;
-  //   final result = await db.query(ProductTable.PRODUCTS_TABLE);
-  //   List<Product> products = result.isNotEmpty
-  //       ? result.map((row) => Product.fromMap(row)).toList()
-  //       : [];
-  //   return products;
-  // }
-
-  // SELLER
-  // Future<List<Product>> getProductsByUserId(int userId) async {
-  //   final db = await dbProvider.database;
-  //   final result = await db.query(ProductTable.PRODUCTS_TABLE,
-  //       where: '${ProductTable.PRODUCTS_USER_ID} = ?', whereArgs: [userId]);
-  //   List<Product> products = result.isNotEmpty
-  //       ? result.map((row) => Product.fromMap(row)).toList()
-  //       : [];
-  //   return products;
-  // }
-
-  // Future<Product> getProductById(int productId) async {
-  //   final db = await dbProvider.database;
-  //   final result = await db.query(ProductTable.PRODUCTS_TABLE,
-  //       where: '${ProductTable.PRODUCTS_ID} = ?', whereArgs: [productId]);
-  //   List<Product> products = result.isNotEmpty
-  //       ? result.map((row) => Product.fromMap(row)).toList()
-  //       : [];
-  //   return products.isNotEmpty ? products[0] : Product.empty();
-  // }
-
   Future<List<ProductDetail>> getAllProductDetails() async {
     final db = await dbProvider.database;
 

@@ -111,7 +111,17 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildBody(context),
+      body: BlocListener<ProductBloc, ProductState>(
+        listener: (context, state) {
+          if (state is ProductSuccess) {
+            SharedCode(context).successSnackBar(text: state.message);
+          }
+          if (state is ProductError) {
+            SharedCode(context).errorSnackBar(text: state.message);
+          }
+        },
+        child: _buildBody(context),
+      ),
     );
   }
 
@@ -129,17 +139,27 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   SharedCode(context).errorSnackBar(
                       text: "Silahkan pilih gambar terlebih dahulu");
                 } else if (_formAddKey.currentState!.validate()) {
-                  context.read<ProductBloc>().add(AddProduct(Product(
-                        name: _nameController.text,
-                        description: _descriptionController.text,
-                        stock: int.parse(_stockController.text),
-                        price: int.parse(_priceController.text),
-                        image: _image,
-                        userId: user!.id!,
-                      )));
-                  debugPrint("berhasil menambahkan data");
-                  SharedCode(context)
-                      .successSnackBar(text: "Berhasil tambah data");
+                  widget.product == null
+                      ? context.read<ProductBloc>().add(AddProduct(Product(
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            stock: int.parse(_stockController.text),
+                            price: int.parse(_priceController.text),
+                            image: _image,
+                            userId: user!.id!,
+                          )))
+                      : context.read<ProductBloc>().add(UpdateProduct(Product(
+                            id: widget.product!.id,
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            stock: int.parse(_stockController.text),
+                            price: int.parse(_priceController.text),
+                            image: _image,
+                            userId: user!.id!,
+                          )));
+                  debugPrint(widget.product == null
+                      ? "berhasil menambahkan data"
+                      : "berhasil menambahkan data");
                   context.pop(true);
                 } else {
                   SharedCode(context)
