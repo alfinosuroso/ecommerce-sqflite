@@ -1,7 +1,9 @@
+import 'package:ecommerce_sqflite/bloc/cart/cart_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/product/product_bloc.dart';
 import 'package:ecommerce_sqflite/bloc/user/user_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/router/AppRouter.dart';
+import 'package:ecommerce_sqflite/services/dao/cart_dao.dart';
 import 'package:ecommerce_sqflite/services/dao/product_dao.dart';
 import 'package:ecommerce_sqflite/services/dao/user_dao.dart';
 import 'package:ecommerce_sqflite/services/session/auth_service.dart';
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Sizer(
-      builder: (context, orientation, DeviceType) {
+      builder: (context, orientation, deviceType) {
         return MultiBlocProvider(
           providers: [
             BlocProvider(
@@ -29,6 +31,9 @@ class MyApp extends StatelessWidget {
             ),
             BlocProvider(
               create: (context) => ProductBloc(ProductDao()),
+            ),
+            BlocProvider(
+              create: (context) => CartBloc(CartDao()),
             ),
           ],
           child: MaterialApp.router(

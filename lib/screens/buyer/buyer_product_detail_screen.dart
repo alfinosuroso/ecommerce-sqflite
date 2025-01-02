@@ -1,14 +1,17 @@
 import 'dart:io';
 
+import 'package:ecommerce_sqflite/bloc/cart/cart_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
 import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/models/cart.dart';
 import 'package:ecommerce_sqflite/models/product_detail.dart';
 import 'package:ecommerce_sqflite/widgets/line_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BuyerProductDetailScreen extends StatelessWidget {
   ProductDetail productDetail;
@@ -16,9 +19,20 @@ class BuyerProductDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildBody(context),
+    return BlocConsumer<CartBloc, CartState>(
+      listener: (context, state) {
+        if (state is CartSuccess) {
+          SharedCode(context).successSnackBar(text: state.message);
+        } else if (state is CartError) {
+          SharedCode(context).errorSnackBar(text: state.message);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: _buildAppBar(context),
+          body: _buildBody(context),
+        );
+      },
     );
   }
 
@@ -59,7 +73,14 @@ class BuyerProductDetailScreen extends StatelessWidget {
                   backgroundColor: productDetail.product.stock == 0
                       ? AppColors.grey
                       : AppThemeData.getTheme(context).primaryColor),
-              onPressed: () {},
+              onPressed: () {
+                context.read<CartBloc>().add(AddToCart(Cart(
+                      id: null,
+                      userId: productDetail.user.id!,
+                      productId: productDetail.product.id!,
+                      quantity: 1,
+                    )));
+              },
               child: Text(productDetail.product.stock == 0
                   ? "Stok Habis"
                   : "Tambahkan ke Keranjang"),
