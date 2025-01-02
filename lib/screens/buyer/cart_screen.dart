@@ -1,10 +1,16 @@
+import 'package:ecommerce_sqflite/bloc/cart/cart_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/models/cart_detail.dart';
+import 'package:ecommerce_sqflite/models/user.dart';
+import 'package:ecommerce_sqflite/services/dao/cart_dao.dart';
+import 'package:ecommerce_sqflite/services/session/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sizer/sizer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -14,17 +20,34 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final User? _user = AuthService.getUser();
   int _totalCart = 10;
+  List<CartDetail> _cartDetail = [];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(context),
+    return BlocProvider(
+      create: (context) =>
+          CartBloc(CartDao())..add(GetCartByUserId(_user!.id!)),
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        body: BlocBuilder<CartBloc, CartState>(
+          builder: (context, state) {
+            if (state is CartLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is CartLoaded) {
+              _cartDetail.clear();
+              _cartDetail.addAll(state.cartDetailsList);
+              return _buildBody(context);
+            }
+            return _buildBody(context);
+          },
+        ),
+      ),
     );
   }
 
   Widget _buildBody(BuildContext context) {
-    return _totalCart == 0
+    return _cartDetail.isEmpty
         ? _emptyCart()
         : Column(
             children: [
@@ -104,7 +127,7 @@ class _CartScreenState extends State<CartScreen> {
   Expanded _topBody() {
     return Expanded(
       child: ListView.builder(
-        itemCount: _totalCart,
+        itemCount: _cartDetail.length,
         itemBuilder: (context, index) {
           return _buildCartItem(context);
         },

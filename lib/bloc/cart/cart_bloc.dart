@@ -40,10 +40,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<UpdateCart>((event, emit) async {
-      emit(CartLoading());
+      emit(CartInitial());
       try {
         bool success = await cartDao.updateCart(event.cart);
         if (success) {
+          add(GetCartByUserId(event.cart.userId));
           emit(const CartSuccess("Berhasil memperbarui produk di keranjang"));
         } else {
           emit(const CartError("Gagal memperbarui produk di keranjang"));
