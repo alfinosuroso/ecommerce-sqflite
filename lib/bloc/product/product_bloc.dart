@@ -16,7 +16,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<GetProducts>((event, emit) async {
       emit(ProductLoading());
       try {
-        final products = await ProductDao().getAllProductDetails();
+        final products = await productDao.getAllProductDetails();
         emit(ProductLoaded(products));
       } catch (e) {
         emit(ProductError(e.toString()));
@@ -26,7 +26,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<GetProductsByUserId>((event, emit) async {
       emit(ProductLoading());
       try {
-        final products = await ProductDao().getProductsByUserId(event.userId);
+        final products = await productDao.getProductsByUserId(event.userId);
         emit(ProductLoaded(products));
       } catch (e) {
         emit(ProductError(e.toString()));
@@ -36,7 +36,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<AddProduct>((event, emit) async {
       emit(ProductLoading());
       try {
-        bool success = await ProductDao().insertProduct(event.product);
+        bool success = await productDao.insertProduct(event.product);
         if (success) {
           emit(const ProductSuccess("Produk berhasil ditambahkan"));
         } else {
@@ -51,7 +51,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<UpdateProduct>((event, emit) async {
       emit(ProductLoading());
       try {
-        bool success = await ProductDao().updateProduct(event.product);
+        bool success = await productDao.updateProduct(event.product);
         if (success) {
           emit(const ProductSuccess("Produk berhasil diupdate"));
         } else {
@@ -66,7 +66,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<DeleteProduct>((event, emit) async {
       emit(ProductLoading());
       try {
-        bool success = await ProductDao().deleteProduct(event.productId);
+        bool success = await productDao.deleteProduct(event.productId);
         if (success) {
           emit(const ProductSuccess("Produk berhasil dihapus"));
         } else {
