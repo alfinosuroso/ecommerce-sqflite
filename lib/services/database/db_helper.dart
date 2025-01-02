@@ -41,9 +41,9 @@ class DBHelper {
       Database database, int oldVersion, int newVersion) async {
     if (newVersion > oldVersion) {
       // update tables
-      debugPrint("update tables");
-      await database.execute('''DROP TABLE IF EXISTS carts''');
-      CartTable.createTable(database, newVersion);
+      // debugPrint("update tables");
+      // await database.execute('''DROP TABLE IF EXISTS carts''');
+      // CartTable.createTable(database, newVersion);
     }
   }
 
