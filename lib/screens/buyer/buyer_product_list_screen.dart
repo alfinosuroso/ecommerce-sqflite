@@ -31,6 +31,13 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
   final ValueNotifier<bool> _triggerFilter = ValueNotifier(true);
   final TextEditingController _searchController = TextEditingController();
 
+  // init
+  @override
+  void initState() {
+    debugPrint('init');
+    super.initState();
+  }
+
   // dispose
   @override
   void dispose() {
@@ -134,22 +141,27 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
   Widget _productGrid(BuildContext context) {
     return _products.isEmpty
         ? const Center(child: Text("Produk tidak ditemukan"))
-        : GridView.builder(
-            itemCount: _products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              ProductDetail productDetail = _products[index];
-              return ProductItem(
-                context: context,
-                index: index,
-                productDetail: productDetail,
-                user: _user,
-              );
+        : RefreshIndicator(
+            onRefresh: () async {
+              context.read<ProductBloc>().add(GetProducts());
             },
+            child: GridView.builder(
+              itemCount: _products.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemBuilder: (context, index) {
+                ProductDetail productDetail = _products[index];
+                return ProductItem(
+                  context: context,
+                  index: index,
+                  productDetail: productDetail,
+                  user: _user,
+                );
+              },
+            ),
           );
   }
 
@@ -168,6 +180,7 @@ class _BuyerProductListScreenState extends State<BuyerProductListScreen> {
             await AuthService.clearUser();
             SharedCode(context).successSnackBar(text: "Berhasil logout");
             context.read<UserBloc>().add(CheckUser());
+            context.go("/signin");
           },
           icon: const Icon(Icons.logout, color: AppColors.red),
         ),

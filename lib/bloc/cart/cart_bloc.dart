@@ -28,6 +28,16 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       }
     });
 
+    on<GetCart>((event, emit) async {
+      try {
+        List<CartDetail> cart = await cartDao.getAllCart();
+        emit(CartLoaded(cart));
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartError(e.toString()));
+      }
+    });
+
     on<GetCartByUserId>((event, emit) async {
       emit(CartLoading());
       try {
@@ -40,14 +50,14 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<UpdateCart>((event, emit) async {
-      emit(CartInitial());
       try {
         bool success = await cartDao.updateCart(event.cart);
         if (success) {
+          // emit(const CartSuccess("Berhasil memperbarui produk di keranjang"));
           add(GetCartByUserId(event.cart.userId));
-          emit(const CartSuccess("Berhasil memperbarui produk di keranjang"));
         } else {
-          emit(const CartError("Gagal memperbarui produk di keranjang"));
+          emit(const CartError(
+              "Stok lebih kecil dari jumlah produk di keranjang"));
         }
       } catch (e) {
         debugPrint(e.toString());
@@ -56,11 +66,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     });
 
     on<DeleteCart>((event, emit) async {
-      emit(CartLoading());
       try {
         bool success = await cartDao.deleteCart(event.cartId);
         if (success) {
           emit(const CartSuccess("Berhasil menghapus produk di keranjang"));
+          add(GetCartByUserId(event.userId));
         } else {
           emit(const CartError("Gagal menghapus produk di keranjang"));
         }
@@ -81,6 +91,21 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         }
       } catch (e) {
         debugPrint(e.toString());
+      }
+    });
+
+    on<CheckoutCart>((event, emit) async {
+      emit(CartLoading());
+      try {
+        bool success = await cartDao.checkoutCart(event.userId);
+        if (success) {
+          emit(const CartSuccess("Berhasil checkout keranjang"));
+        } else {
+          emit(const CartError("Gagal checkout keranjang"));
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(CartError(e.toString()));
       }
     });
   }

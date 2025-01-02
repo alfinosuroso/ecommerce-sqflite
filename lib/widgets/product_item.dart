@@ -31,17 +31,37 @@ class ProductItem extends StatelessWidget {
     return InkWell(
       onTap: () async {
         user!.role == "Penjual"
-            ? context.go("/product-seller/details")
-            : context.push("/product-buyer/details", extra: productDetail);
+            ? context.go("/product-seller/details", extra: productDetail)
+            : context.go("/product-buyer/details", extra: productDetail);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Dimen.radius),
-              child: Image.file(File(productDetail.product.image),
-                  width: double.infinity, fit: BoxFit.cover),
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(Dimen.radius),
+                  child: Image.file(File(productDetail.product.image),
+                      width: double.infinity, fit: BoxFit.cover),
+                ),
+                productDetail.product.stock == 0
+                    ? Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(Dimen.radius),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Stok Habis",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ],
             ),
           ),
           Dimen.verticalSpaceSmall,

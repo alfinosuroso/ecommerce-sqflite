@@ -81,7 +81,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
 
               return _buildBody(context, state.products);
             }
-            return const Text("Terjadi Kesalahan Pada Database");
+            return _buildBody(context, _products);
           },
         ),
         // floatingActionButton: _buildFab(context),
@@ -270,22 +270,27 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
   Widget _productGrid(BuildContext context) {
     return _products.isEmpty
         ? const Center(child: Text("Belum ada produk"))
-        : GridView.builder(
-            itemCount: _products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              ProductDetail productDetail = _products[index];
-              return ProductItem(
-                context: context,
-                index: index,
-                productDetail: productDetail,
-                user: _user,
-              );
+        : RefreshIndicator(
+            onRefresh: () async {
+              context.read<ProductBloc>().add(GetProductsByUserId(_user!.id!));
             },
+            child: GridView.builder(
+              itemCount: _products.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemBuilder: (context, index) {
+                ProductDetail productDetail = _products[index];
+                return ProductItem(
+                  context: context,
+                  index: index,
+                  productDetail: productDetail,
+                  user: _user,
+                );
+              },
+            ),
           );
   }
 
@@ -298,6 +303,7 @@ class _SellerProductListScreenState extends State<SellerProductListScreen> {
             await AuthService.clearUser();
             SharedCode(context).successSnackBar(text: "Berhasil logout");
             context.read<UserBloc>().add(CheckUser());
+            context.go("/signin");
           },
           icon: const Icon(Icons.logout, color: AppColors.red),
         ),

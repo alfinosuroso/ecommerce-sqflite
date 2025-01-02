@@ -6,7 +6,7 @@ class Cart {
   final int quantity;
 
   Cart({
-    required this.id,
+    this.id,
     required this.userId,
     required this.productId,
     required this.quantity,
@@ -21,8 +21,8 @@ class Cart {
 
   factory Cart.fromQueryRow(Map<String, dynamic> row) => Cart(
         id: row['cart_id'] as int?,
-        userId: row['cart_userId'] as int,
-        productId: row['cart_productId'] as int,
+        userId: row['cart_user_id'] as int,
+        productId: row['cart_product_id'] as int,
         quantity: row['cart_quantity'] as int,
       );
 

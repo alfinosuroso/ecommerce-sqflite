@@ -29,11 +29,11 @@ class SharedCode {
         text,
         style: Theme.of(context)
             .textTheme
-            .labelLarge
+            .bodyMedium
             ?.copyWith(color: Colors.white),
       ),
       backgroundColor: AppColors.green,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -47,11 +47,11 @@ class SharedCode {
         text,
         style: Theme.of(context)
             .textTheme
-            .labelLarge
+            .bodyMedium
             ?.copyWith(color: Colors.white),
       ),
       backgroundColor: AppColors.darkRed,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);

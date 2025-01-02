@@ -4,7 +4,7 @@ import 'package:ecommerce_sqflite/screens/buyer/order_success_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/add_edit_product_screen.dart';
 import 'package:ecommerce_sqflite/screens/seller/seller_product_list_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ecommerce_sqflite/screens/buyer/buyer_product_detail_screen.dart';
+import 'package:ecommerce_sqflite/screens/user_product_detail_screen.dart';
 import 'package:ecommerce_sqflite/screens/buyer/buyer_product_list_screen.dart';
 import 'package:ecommerce_sqflite/screens/buyer/cart_screen.dart';
 import 'package:ecommerce_sqflite/screens/home_screen.dart';
@@ -25,11 +25,11 @@ class AppRouter {
         builder: (context, state) => const BuyerProductListScreen(),
         routes: [
           GoRoute(
-            name: "details",
+            name: "details-buyer",
             path: "details",
             builder: (context, state) {
               final productDetail = state.extra as ProductDetail;
-              return BuyerProductDetailScreen(productDetail: productDetail);
+              return UserProductDetailScreen(productDetail: productDetail);
             },
           ),
           GoRoute(
@@ -55,6 +55,14 @@ class AppRouter {
               builder: (context, state) {
                 final product = state.extra as Product?;
                 return AddEditProductScreen(product: product);
+              },
+            ),
+            GoRoute(
+              name: "details-seller",
+              path: "details",
+              builder: (context, state) {
+                final productDetail = state.extra as ProductDetail;
+                return UserProductDetailScreen(productDetail: productDetail);
               },
             ),
           ]),

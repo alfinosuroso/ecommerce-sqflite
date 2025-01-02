@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:ecommerce_sqflite/bloc/cart/cart_bloc.dart';
 import 'package:ecommerce_sqflite/common/app_colors.dart';
 import 'package:ecommerce_sqflite/common/app_theme_data.dart';
 import 'package:ecommerce_sqflite/common/dimen.dart';
+import 'package:ecommerce_sqflite/common/shared_code.dart';
+import 'package:ecommerce_sqflite/models/cart.dart';
 import 'package:ecommerce_sqflite/models/cart_detail.dart';
 import 'package:ecommerce_sqflite/models/user.dart';
 import 'package:ecommerce_sqflite/services/dao/cart_dao.dart';
@@ -21,8 +25,8 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final User? _user = AuthService.getUser();
-  int _totalCart = 10;
   List<CartDetail> _cartDetail = [];
+  int _totalPrice = 0;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -30,13 +34,27 @@ class _CartScreenState extends State<CartScreen> {
           CartBloc(CartDao())..add(GetCartByUserId(_user!.id!)),
       child: Scaffold(
         appBar: _buildAppBar(),
-        body: BlocBuilder<CartBloc, CartState>(
+        body: BlocConsumer<CartBloc, CartState>(
+          listener: (context, state) {
+            if (state is CartSuccess) {
+              SharedCode(context).successSnackBar(text: state.message);
+            } else if (state is CartError) {
+              SharedCode(context).errorSnackBar(text: state.message);
+            }
+          },
           builder: (context, state) {
             if (state is CartLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is CartLoaded) {
+              debugPrint("loaded");
               _cartDetail.clear();
               _cartDetail.addAll(state.cartDetailsList);
+              _totalPrice = _cartDetail.fold(
+                  0,
+                  (previousValue, element) =>
+                      previousValue +
+                      (element.product.price * element.cart.quantity));
+              debugPrint("cart detail:${_cartDetail.length}");
               return _buildBody(context);
             }
             return _buildBody(context);
@@ -48,7 +66,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildBody(BuildContext context) {
     return _cartDetail.isEmpty
-        ? _emptyCart()
+        ? _emptyCart(context)
         : Column(
             children: [
               _topBody(),
@@ -58,7 +76,7 @@ class _CartScreenState extends State<CartScreen> {
           );
   }
 
-  Widget _emptyCart() {
+  Widget _emptyCart(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +94,9 @@ class _CartScreenState extends State<CartScreen> {
           Dimen.verticalSpaceMedium,
           ElevatedButton(
             style: ElevatedButton.styleFrom(minimumSize: Size(20.w, 5.h)),
-            onPressed: () {},
+            onPressed: () {
+              context.go("/product-buyer");
+            },
             child: const Text("Cari Produk"),
           ),
           Dimen.verticalSpaceLarge,
@@ -106,7 +126,7 @@ class _CartScreenState extends State<CartScreen> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
-                "Rp. 50000",
+                SharedCode(context).formatToNumber(_totalPrice),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: AppThemeData.getTheme(context).primaryColor),
               ),
@@ -116,6 +136,7 @@ class _CartScreenState extends State<CartScreen> {
           ElevatedButton(
             onPressed: () {
               context.go("/product-buyer/order-success");
+              context.read<CartBloc>().add(CheckoutCart(_user!.id!));
             },
             child: const Text("Bayar Sekarang"),
           ),
@@ -129,13 +150,13 @@ class _CartScreenState extends State<CartScreen> {
       child: ListView.builder(
         itemCount: _cartDetail.length,
         itemBuilder: (context, index) {
-          return _buildCartItem(context);
+          return _buildCartItem(context, index);
         },
       ),
     );
   }
 
-  Widget _buildCartItem(BuildContext context) {
+  Widget _buildCartItem(BuildContext context, int index) {
     return Material(
       child: Container(
         decoration: BoxDecoration(
@@ -157,10 +178,11 @@ class _CartScreenState extends State<CartScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(Dimen.radius),
-              child: Image.asset(
-                "assets/images/sample-1.jpeg",
+              child: Image.file(
+                File(_cartDetail[index].product.image),
                 fit: BoxFit.contain,
                 width: 30.w,
+                height: 10.h,
               ),
             ),
             Dimen.horizontalSpaceSmall,
@@ -173,14 +195,17 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          "Product Name Long Long LongLongLongLongLongLong",
+                          _cartDetail[index].product.name,
                           style: Theme.of(context).textTheme.labelLarge,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.read<CartBloc>().add(DeleteCart(
+                              _cartDetail[index].cart.id!, _user!.id!));
+                        },
                         icon: Icon(
                           Icons.cancel_outlined,
                           color: Colors.grey[400],
@@ -192,7 +217,8 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          "Rp. 50.000",
+                          SharedCode(context)
+                              .formatToNumber(_cartDetail[index].product.price),
                           style: Theme.of(context)
                               .textTheme
                               .labelLarge
@@ -205,14 +231,27 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       IconButton(
                         visualDensity: VisualDensity.compact,
-                        onPressed: () {},
+                        onPressed: () {
+                          context.read<CartBloc>().add(UpdateCart(Cart(
+                              id: _cartDetail[index].cart.id,
+                              userId: _user!.id!,
+                              productId: _cartDetail[index].product.id!,
+                              quantity: _cartDetail[index].cart.quantity - 1)));
+                        },
                         icon: const Icon(Icons.remove),
                         color: Colors.black54,
                       ),
-                      const Text("10"),
+                      Text(_cartDetail[index].cart.quantity.toString()),
                       IconButton(
                           visualDensity: VisualDensity.compact,
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<CartBloc>().add(UpdateCart(Cart(
+                                id: _cartDetail[index].cart.id,
+                                userId: _user!.id!,
+                                productId: _cartDetail[index].product.id!,
+                                quantity:
+                                    _cartDetail[index].cart.quantity + 1)));
+                          },
                           icon: const Icon(Icons.add, color: Colors.black54)),
                     ],
                   ),

@@ -31,7 +31,7 @@ class Product {
 
   // Convert from Query Row (with aliases)
   factory Product.fromQueryRow(Map<String, dynamic> row) => Product(
-        id: row['product_id'] as int?,
+        id: row['product_id'] as int, // Handle nulls
         name: row['product_name'] as String,
         description: row['product_description'] as String,
         image: row['product_image'] as String,

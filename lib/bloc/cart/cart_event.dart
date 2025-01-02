@@ -15,6 +15,8 @@ class AddToCart extends CartEvent {
   List<Object> get props => [cart];
 }
 
+class GetCart extends CartEvent {}
+
 class GetCartByUserId extends CartEvent {
   final int userId;
   const GetCartByUserId(this.userId);
@@ -32,16 +34,24 @@ class UpdateCart extends CartEvent {
 }
 
 class DeleteCart extends CartEvent {
-  final int cartId;
-  const DeleteCart(this.cartId);
+  final int cartId, userId;
+  const DeleteCart(this.cartId, this.userId);
 
   @override
-  List<Object> get props => [cartId];
+  List<Object> get props => [cartId, userId];
 }
 
 class DeleteCartByUserId extends CartEvent {
   final int userId;
   const DeleteCartByUserId(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
+
+class CheckoutCart extends CartEvent {
+  final int userId;
+  const CheckoutCart(this.userId);
 
   @override
   List<Object> get props => [userId];

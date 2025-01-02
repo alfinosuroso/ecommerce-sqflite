@@ -82,21 +82,18 @@ class AppThemeData {
             textStyle: Theme.of(context).textTheme.titleSmall,
           ),
         ),
-        chipTheme: const ChipThemeData(
+        chipTheme: ChipThemeData(
           selectedColor: primaryColor,
           backgroundColor: AppColors.lightBlue,
-          padding: EdgeInsets.all(5.0),
+          padding: const EdgeInsets.all(5.0),
           brightness: Brightness.light,
           disabledColor: Colors.grey,
           secondarySelectedColor: AppColors.lightBlue,
-          secondaryLabelStyle: TextStyle(
+          secondaryLabelStyle: const TextStyle(
             color: AppColors.bluishBlack,
             fontWeight: FontWeight.w500,
           ),
-          labelStyle: TextStyle(
-            color: AppColors.darkBlue,
-            fontWeight: FontWeight.w500,
-          ),
+          labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.darkBlue),
         ),
         // In your app theme file
         inputDecorationTheme: InputDecorationTheme(
