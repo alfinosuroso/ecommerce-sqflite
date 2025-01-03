@@ -1,4 +1,4 @@
-# ecommerce_sqflite
+# ecommerce_sqflite_bloc
 
 E-Commerce with features:
 - sqflite
